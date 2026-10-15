@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notion Photo Gallery Widget</title>
   <style>
-    /* Reset total y transparencia estricta para eliminar cualquier marco blanco */
+    /* Eliminación estricta de bordes y márgenes blancos */
     html, body {
       margin: 0 !important;
       padding: 0 !important;
@@ -13,10 +13,7 @@
       height: 100% !important;
       background: transparent !important;
       background-color: transparent !important;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      overflow: auto; /* Permite scroll si la pantalla es más pequeña que la galería */
       box-sizing: border-box;
     }
 
@@ -24,14 +21,16 @@
       box-sizing: inherit;
     }
 
-    /* Contenedor con tamaño mínimo fijo para evitar deformación/estiramiento */
+    /* Contenedor principal con esquinas redondeadas y tamaño fijo estricto */
     .gallery-container {
       position: relative;
       width: 100%;
+      min-width: 650px; /* Evita que las imágenes se colapsen o reduzcan su ancho */
       height: 100%;
-      min-height: 420px; /* Asegura un alto fijo base */
-      padding: 12px;
-      border-radius: 20px;
+      min-height: 440px; /* Mantiene la altura fija de la referencia */
+      padding: 16px;
+      border-radius: 20px; /* Redondea la imagen de fondo para eliminar las esquinas blancas */
+      overflow: hidden; /* Recorta cualquier fondo blanco que sobresalga en las esquinas */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -43,8 +42,8 @@
     /* Botón flotante de configuración */
     .config-btn {
       position: absolute;
-      top: 18px;
-      right: 18px;
+      top: 22px;
+      right: 22px;
       z-index: 20;
       background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(8px);
@@ -68,7 +67,7 @@
       transform: scale(1.08);
     }
 
-    /* Cuadrícula rígida fija (se mantiene idéntica sin estirarse al reducir) */
+    /* Cuadrícula idéntica fija que conserva el tamaño exacto */
     .gallery-grid {
       display: grid;
       gap: 12px;
@@ -80,7 +79,7 @@
     .gallery-item {
       position: relative;
       overflow: hidden;
-      border-radius: 18px;
+      border-radius: 18px; /* Esquinas redondeadas interiores de las imágenes */
       background-color: rgba(229, 229, 229, 0.4);
       width: 100%;
       height: 100%;
@@ -90,7 +89,7 @@
     .gallery-item img {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* Evita que la foto se deforme o aplaste */
+      object-fit: cover; /* Recorta las imágenes sin deformarlas ni estirarlas */
       display: block;
       transition: transform 0.3s ease;
     }
@@ -99,7 +98,7 @@
       transform: scale(1.03);
     }
 
-    /* Diseños por número de imágenes */
+    /* Diseños fijos por cantidad de imágenes */
     .grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
     .grid-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
 
@@ -110,8 +109,8 @@
 
     .grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
 
-    /* 5 imágenes con proporciones exactas como la foto de referencia */
-    .grid-5 { grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1.3fr 1fr; }
+    /* 5 imágenes con proporciones fijas exactas a la imagen de muestra */
+    .grid-5 { grid-template-columns: 2.1fr 1fr 1fr; grid-template-rows: 1.35fr 1fr; }
     .grid-5 .item-0 { grid-column: 1 / 3; grid-row: 1 / 2; }
     .grid-5 .item-1 { grid-column: 3 / 4; grid-row: 1 / 2; }
     .grid-5 .item-2 { grid-column: 1 / 2; grid-row: 2 / 3; }

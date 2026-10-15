@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notion Gallery Widget</title>
+  <title>Notion Photo Gallery Widget</title>
   <style>
     * {
       box-sizing: border-box;
@@ -11,76 +11,71 @@
       padding: 0;
     }
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      background-color: transparent;
+    body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      overflow: hidden;
+      background-color: transparent;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
 
-    /* Contenedor Principal con fondo personalizable */
-    .widget-container {
+    .gallery-container {
       position: relative;
       width: 100%;
-      height: 100vh;
-      min-height: 400px;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      max-width: 900px;
+      padding: 16px;
+      border-radius: 20px;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      transition: background-image 0.3s ease;
     }
 
-    /* Botón flotante de Ajustes */
+    /* Botón de configuración flotante */
     .config-btn {
       position: absolute;
-      top: 18px;
-      right: 18px;
-      z-index: 30;
-      width: 36px;
-      height: 36px;
+      top: 24px;
+      right: 24px;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 0, 0, 0.15);
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      cursor: pointer;
+      width: 38px;
+      height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
       font-size: 18px;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      opacity: 0.5;
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
+    .gallery-container:hover .config-btn,
     .config-btn:hover {
+      opacity: 1;
       transform: scale(1.08);
-      background: #ffffff;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     }
 
-    /* Cuadrícula Base */
+    /* Grilla de la galería */
     .gallery-grid {
       display: grid;
-      gap: 10px;
+      gap: 12px;
       width: 100%;
-      height: 100%;
-      max-width: 1000px;
-      max-height: 700px;
+      height: 480px;
     }
 
-    /* Items individuales de foto */
     .gallery-item {
       position: relative;
-      width: 100%;
-      height: 100%;
       overflow: hidden;
       border-radius: 18px;
-      background-color: #f1f3f5;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      background-color: #e5e5e5;
+      width: 100%;
+      height: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     .gallery-item img {
@@ -88,67 +83,48 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.35s ease;
+      transition: transform 0.3s ease;
     }
 
     .gallery-item:hover img {
       transform: scale(1.03);
     }
 
-    /* Layouts por cantidad de imágenes (CSS Grid Puro) */
+    /* Diseños por cantidad de imágenes */
+    .grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+    .grid-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
 
-    /* 1 Foto */
-    .grid-1 {
-      grid-template-columns: 1fr;
-      grid-template-rows: 1fr;
-    }
-
-    /* 2 Fotos */
-    .grid-2 {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr;
-    }
-
-    /* 3 Fotos */
-    .grid-3 {
-      grid-template-columns: 2fr 1fr;
-      grid-template-rows: 1fr 1fr;
-    }
+    .grid-3 { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; }
     .grid-3 .item-0 { grid-column: 1 / 2; grid-row: 1 / 3; }
     .grid-3 .item-1 { grid-column: 2 / 3; grid-row: 1 / 2; }
     .grid-3 .item-2 { grid-column: 2 / 3; grid-row: 2 / 3; }
 
-    /* 4 Fotos */
-    .grid-4 {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-    }
+    .grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
 
-    /* 5 Fotos (Coincide exacto con la imagen de referencia) */
-    .grid-5 {
-      grid-template-columns: 2fr 1fr 1fr;
-      grid-template-rows: 1.35fr 1fr;
-    }
-    .grid-5 .item-0 { grid-column: 1 / 3; grid-row: 1 / 2; } /* Grande Horizontal Arriba-Izquierda */
-    .grid-5 .item-1 { grid-column: 3 / 4; grid-row: 1 / 2; } /* Vertical Arriba-Derecha */
-    .grid-5 .item-2 { grid-column: 1 / 2; grid-row: 2 / 3; } /* Abajo 1 */
-    .grid-5 .item-3 { grid-column: 2 / 3; grid-row: 2 / 3; } /* Abajo 2 */
-    .grid-5 .item-4 { grid-column: 3 / 4; grid-row: 2 / 3; } /* Abajo 3 */
+    /* 5 imágenes (Diseño exacto de la referencia) */
+    .grid-5 { grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1.3fr 1fr; }
+    .grid-5 .item-0 { grid-column: 1 / 3; grid-row: 1 / 2; }
+    .grid-5 .item-1 { grid-column: 3 / 4; grid-row: 1 / 2; }
+    .grid-5 .item-2 { grid-column: 1 / 2; grid-row: 2 / 3; }
+    .grid-5 .item-3 { grid-column: 2 / 3; grid-row: 2 / 3; }
+    .grid-5 .item-4 { grid-column: 3 / 4; grid-row: 2 / 3; }
 
     /* Modal de Configuración */
     .modal-overlay {
       position: fixed;
-      inset: 0;
-      z-index: 100;
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(5px);
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 100;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.25s ease;
-      padding: 16px;
+      transition: opacity 0.2s ease;
     }
 
     .modal-overlay.active {
@@ -156,22 +132,21 @@
       pointer-events: auto;
     }
 
-    .modal-content {
+    .modal {
       background: #ffffff;
-      width: 100%;
-      max-width: 440px;
+      padding: 24px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 460px;
       max-height: 85vh;
-      border-radius: 20px;
-      padding: 22px;
-      box-shadow: 0 12px 36px rgba(0,0,0,0.25);
       overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     }
 
-    .modal-content h2 {
-      font-size: 17px;
-      font-weight: 700;
+    .modal h2 {
+      font-size: 18px;
       margin-bottom: 16px;
-      color: #111;
+      color: #222;
     }
 
     .form-group {
@@ -180,25 +155,25 @@
 
     .form-group label {
       display: block;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
+      margin-bottom: 6px;
       color: #444;
-      margin-bottom: 5px;
     }
 
-    .form-group input,
-    .form-group select {
+    .form-group select,
+    .form-group input {
       width: 100%;
-      padding: 9px 12px;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      border: 1px solid #ddd;
       font-size: 13px;
       outline: none;
     }
 
-    .form-group input:focus,
-    .form-group select:focus {
-      border-color: #2563eb;
+    .form-group select:focus,
+    .form-group input:focus {
+      border-color: #0070f3;
     }
 
     .modal-actions {
@@ -209,61 +184,57 @@
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 9px 16px;
       border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
-      border: none;
       cursor: pointer;
+      border: none;
     }
 
-    .btn-cancel { background: #f1f3f5; color: #495057; }
-    .btn-save { background: #2563eb; color: #ffffff; }
+    .btn-secondary { background: #eee; color: #333; }
+    .btn-primary { background: #0070f3; color: #fff; }
   </style>
 </head>
 <body>
 
-  <div class="widget-container" id="widgetContainer">
+  <div class="gallery-container" id="galleryContainer">
     <button class="config-btn" id="openModalBtn" title="Configurar Galería">⚙️</button>
     <div class="gallery-grid grid-5" id="galleryGrid"></div>
   </div>
 
-  <!-- Modal de Configuración -->
+  <!-- Modal -->
   <div class="modal-overlay" id="modalOverlay">
-    <div class="modal-content">
-      <h2>Ajustes de Galería</h2>
-
+    <div class="modal">
+      <h2>Configurar Galería</h2>
+      
       <div class="form-group">
-        <label for="bgInput">URL Fondo del Widget (Opcional):</label>
+        <label for="bgInput">URL Imagen de Fondo (Opcional):</label>
         <input type="text" id="bgInput" placeholder="https://ejemplo.com/fondo.jpg">
       </div>
 
       <div class="form-group">
-        <label for="imageCountSelect">Cantidad de imágenes (1 a 5):</label>
-        <select id="imageCountSelect">
-          <option value="1">1 Foto</option>
-          <option value="2">2 Fotos</option>
-          <option value="3">3 Fotos</option>
-          <option value="4">4 Fotos</option>
-          <option value="5" selected>5 Fotos (Collage Referencia)</option>
+        <label for="imageCount">Cantidad de fotos (1 a 5):</label>
+        <select id="imageCount">
+          <option value="1">1 Imagen</option>
+          <option value="2">2 Imágenes</option>
+          <option value="3">3 Imágenes</option>
+          <option value="4">4 Imágenes</option>
+          <option value="5" selected>5 Imágenes (Diseño Referencia)</option>
         </select>
       </div>
 
-      <div id="dynamicInputs"></div>
+      <div id="urlInputsContainer"></div>
 
       <div class="modal-actions">
-        <button class="btn btn-cancel" id="closeModalBtn">Cancelar</button>
-        <button class="btn btn-save" id="saveModalBtn">Guardar</button>
+        <button class="btn btn-secondary" id="closeModalBtn">Cancelar</button>
+        <button class="btn btn-primary" id="saveBtn">Guardar Cambios</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Respaldo de imagen en SVG Base64 (Nunca falla)
-    const SVG_FALLBACK = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22400%22%20viewBox%3D%220%200%20600%20400%22%3E%3Crect%20fill%3D%22%23e2e8f0%22%20width%3D%22600%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%2394a3b8%22%20font-family%3D%22sans-serif%22%20font-size%3D%2220%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3EImagen%20no%20disponible%3C%2Ftext%3E%3C%2Fsvg%3E";
-
-    // URLs por defecto súper estables de Unsplash
-    const DEFAULT_IMAGES = [
+    const defaults = [
       "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80",
       "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80",
       "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&q=80",
@@ -271,52 +242,45 @@
       "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=600&q=80"
     ];
 
-    // Estado en memoria de la aplicación
-    let currentCount = 5;
-    let currentImages = [...DEFAULT_IMAGES];
-    let currentBg = '';
+    // Leer parámetros desde la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let count = parseInt(urlParams.get('count')) || 5;
+    let bgUrl = urlParams.get('bg') || '';
+    let images = [];
 
-    // Referencias DOM
-    const widgetContainer = document.getElementById('widgetContainer');
+    for (let i = 0; i < count; i++) {
+      images[i] = urlParams.get(`img${i + 1}`) || defaults[i % defaults.length];
+    }
+
+    const galleryContainer = document.getElementById('galleryContainer');
     const galleryGrid = document.getElementById('galleryGrid');
     const modalOverlay = document.getElementById('modalOverlay');
     const openModalBtn = document.getElementById('openModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
-    const saveModalBtn = document.getElementById('saveModalBtn');
-    const imageCountSelect = document.getElementById('imageCountSelect');
+    const saveBtn = document.getElementById('saveBtn');
+    const imageCountSelect = document.getElementById('imageCount');
     const bgInput = document.getElementById('bgInput');
-    const dynamicInputs = document.getElementById('dynamicInputs');
+    const urlInputsContainer = document.getElementById('urlInputsContainer');
 
-    // Renderizar Cuadrícula de la Galería
     function renderGallery() {
-      // Aplicar imagen de fondo al contenedor
-      if (currentBg && currentBg.trim() !== '') {
-        widgetContainer.style.backgroundImage = `url('${currentBg}')`;
+      if (bgUrl && bgUrl.trim() !== '') {
+        galleryContainer.style.backgroundImage = `url('${bgUrl}')`;
       } else {
-        widgetContainer.style.backgroundImage = 'none';
+        galleryContainer.style.backgroundImage = 'none';
       }
 
-      // Ajustar clases CSS de cuadrícula
-      galleryGrid.className = `gallery-grid grid-${currentCount}`;
+      galleryGrid.className = `gallery-grid grid-${count}`;
       galleryGrid.innerHTML = '';
 
-      // Crear los marcos de imagen
-      for (let i = 0; i < currentCount; i++) {
+      for (let i = 0; i < count; i++) {
         const item = document.createElement('div');
         item.className = `gallery-item item-${i}`;
 
         const img = document.createElement('img');
-        const srcUrl = (currentImages[i] && currentImages[i].trim() !== '') 
-          ? currentImages[i] 
-          : DEFAULT_IMAGES[i % DEFAULT_IMAGES.length];
-
-        img.src = srcUrl;
+        img.src = images[i] && images[i].trim() !== '' ? images[i] : defaults[i % defaults.length];
         img.alt = `Foto ${i + 1}`;
-        
-        // Asignar SVG si la imagen remota falla al cargar
         img.onerror = function() {
-          this.onerror = null;
-          this.src = SVG_FALLBACK;
+          this.src = defaults[i % defaults.length];
         };
 
         item.appendChild(img);
@@ -324,34 +288,32 @@
       }
     }
 
-    // Generar inputs dinámicos en el modal
     function renderInputs() {
-      dynamicInputs.innerHTML = '';
-      const count = parseInt(imageCountSelect.value, 10);
+      urlInputsContainer.innerHTML = '';
+      const selectedCount = parseInt(imageCountSelect.value);
 
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < selectedCount; i++) {
         const group = document.createElement('div');
         group.className = 'form-group';
 
         const label = document.createElement('label');
-        label.innerText = `URL Imagen ${i + 1}:`;
+        label.innerText = `URL Foto ${i + 1}:`;
 
         const input = document.createElement('input');
         input.type = 'text';
-        input.value = currentImages[i] || '';
-        input.placeholder = DEFAULT_IMAGES[i % DEFAULT_IMAGES.length];
-        input.classList.add('url-input-field');
+        input.value = images[i] || '';
+        input.placeholder = defaults[i % defaults.length];
+        input.classList.add('url-input-item');
 
         group.appendChild(label);
         group.appendChild(input);
-        dynamicInputs.appendChild(group);
+        urlInputsContainer.appendChild(group);
       }
     }
 
-    // Eventos
     openModalBtn.addEventListener('click', () => {
-      imageCountSelect.value = currentCount;
-      bgInput.value = currentBg;
+      imageCountSelect.value = count;
+      bgInput.value = bgUrl;
       renderInputs();
       modalOverlay.classList.add('active');
     });
@@ -362,25 +324,34 @@
 
     imageCountSelect.addEventListener('change', renderInputs);
 
-    saveModalBtn.addEventListener('click', () => {
-      currentCount = parseInt(imageCountSelect.value, 10);
-      currentBg = bgInput.value.trim();
+    saveBtn.addEventListener('click', () => {
+      const newCount = parseInt(imageCountSelect.value);
+      const newBg = bgInput.value.trim();
+      const inputElements = urlInputsContainer.querySelectorAll('.url-input-item');
 
-      const inputFields = dynamicInputs.querySelectorAll('.url-input-field');
-      currentImages = [];
+      // Generar nueva URL con parámetros guardados
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('count', newCount);
+      
+      if (newBg) {
+        newUrl.searchParams.set('bg', newBg);
+      } else {
+        newUrl.searchParams.delete('bg');
+      }
 
-      inputFields.forEach((field, idx) => {
-        currentImages[idx] = field.value.trim();
+      inputElements.forEach((input, idx) => {
+        if (input.value.trim()) {
+          newUrl.searchParams.set(`img${idx + 1}`, input.value.trim());
+        } else {
+          newUrl.searchParams.delete(`img${idx + 1}`);
+        }
       });
 
-      renderGallery();
-      modalOverlay.classList.remove('active');
+      // Redireccionar a la nueva URL guardada
+      window.location.href = newUrl.toString();
     });
 
-    // Iniciar renderizado al cargar la ventana
-    window.onload = function() {
-      renderGallery();
-    };
+    renderGallery();
   </script>
 </body>
 </html>

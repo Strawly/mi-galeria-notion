@@ -220,4 +220,175 @@
       border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
-      cursor:
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-secondary { background: #f0f0f0; color: #333; }
+    .btn-primary { background: #0070f3; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="gallery-container" id="galleryContainer">
+    <button class="config-btn" id="openModalBtn" title="Configurar Galería">⚙️</button>
+    <div class="gallery-grid grid-5" id="galleryGrid"></div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2>Configurar Galería</h2>
+      
+      <div class="form-group">
+        <label for="bgInput">URL Imagen de Fondo (Opcional):</label>
+        <input type="text" id="bgInput" placeholder="https://ejemplo.com/fondo.jpg">
+      </div>
+
+      <div class="form-group">
+        <label for="imageCount">Cantidad de fotos (1 a 5):</label>
+        <select id="imageCount">
+          <option value="1">1 Imagen</option>
+          <option value="2">2 Imágenes</option>
+          <option value="3">3 Imágenes</option>
+          <option value="4">4 Imágenes</option>
+          <option value="5" selected>5 Imágenes (Diseño Referencia)</option>
+        </select>
+      </div>
+
+      <div id="urlInputsContainer"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="closeModalBtn">Cancelar</button>
+        <button class="btn btn-primary" id="saveBtn">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaults = [
+      "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=600&q=80"
+    ];
+
+    function getStoredData(key, fallback) {
+      try {
+        const val = localStorage.getItem(key);
+        return val !== null ? JSON.parse(val) : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function setStoredData(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch (e) {
+        console.warn('LocalStorage inaccesible:', e);
+      }
+    }
+
+    let count = getStoredData('notion_gal_count', 5);
+    let images = getStoredData('notion_gal_images', []);
+    let bgUrl = getStoredData('notion_gal_bg', '');
+
+    const galleryContainer = document.getElementById('galleryContainer');
+    const galleryGrid = document.getElementById('galleryGrid');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const imageCountSelect = document.getElementById('imageCount');
+    const bgInput = document.getElementById('bgInput');
+    const urlInputsContainer = document.getElementById('urlInputsContainer');
+
+    function renderGallery() {
+      if (bgUrl && bgUrl.trim() !== '') {
+        galleryContainer.style.backgroundImage = `url('${bgUrl}')`;
+      } else {
+        galleryContainer.style.backgroundImage = 'none';
+      }
+
+      galleryGrid.className = `gallery-grid grid-${count}`;
+      galleryGrid.innerHTML = '';
+
+      for (let i = 0; i < count; i++) {
+        const item = document.createElement('div');
+        item.className = `gallery-item item-${i}`;
+
+        const img = document.createElement('img');
+        const srcToUse = (images[i] && images[i].trim() !== '') ? images[i] : defaults[i % defaults.length];
+        
+        img.src = srcToUse;
+        img.alt = `Foto ${i + 1}`;
+        img.onerror = function() {
+          this.src = defaults[i % defaults.length];
+        };
+
+        item.appendChild(img);
+        galleryGrid.appendChild(item);
+      }
+    }
+
+    function renderInputs() {
+      urlInputsContainer.innerHTML = '';
+      const selectedCount = parseInt(imageCountSelect.value);
+
+      for (let i = 0; i < selectedCount; i++) {
+        const group = document.createElement('div');
+        group.className = 'form-group';
+
+        const label = document.createElement('label');
+        label.innerText = `URL Foto ${i + 1}:`;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = images[i] || '';
+        input.placeholder = defaults[i % defaults.length];
+        input.classList.add('url-input-item');
+
+        group.appendChild(label);
+        group.appendChild(input);
+        urlInputsContainer.appendChild(group);
+      }
+    }
+
+    openModalBtn.addEventListener('click', () => {
+      imageCountSelect.value = count;
+      bgInput.value = bgUrl;
+      renderInputs();
+      modalOverlay.classList.add('active');
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      modalOverlay.classList.remove('active');
+    });
+
+    imageCountSelect.addEventListener('change', renderInputs);
+
+    saveBtn.addEventListener('click', () => {
+      count = parseInt(imageCountSelect.value);
+      bgUrl = bgInput.value.trim();
+
+      const inputElements = urlInputsContainer.querySelectorAll('.url-input-item');
+      images = [];
+
+      inputElements.forEach((input, idx) => {
+        images[idx] = input.value.trim();
+      });
+
+      setStoredData('notion_gal_count', count);
+      setStoredData('notion_gal_images', images);
+      setStoredData('notion_gal_bg', bgUrl);
+
+      renderGallery();
+      modalOverlay.classList.remove('active');
+    });
+
+    renderGallery();
+  </script>
+</body>
+</html>

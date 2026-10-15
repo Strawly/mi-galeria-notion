@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notion Header Widget</title>
-  <!-- Fuentes estéticas desde Google Fonts -->
+  <!-- Fuentes desde Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 
   <style>
-    /* Reset total y transparencia estricta para evitar cuadros blancos en Notion */
+    /* Reset de márgenes y transparencia */
     html, body {
       margin: 0 !important;
       padding: 0 !important;
@@ -29,20 +29,20 @@
       box-sizing: border-box;
     }
 
-    /* Clases de fuentes seleccionables */
+    /* Clases de tipografías */
     .font-serif { font-family: 'Georgia', 'Times New Roman', serif; }
     .font-sans { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
     .font-mono { font-family: 'Courier New', Courier, monospace; }
     .font-playfair { font-family: 'Playfair Display', serif; }
     .font-script { font-family: 'Dancing Script', cursive; }
 
-    /* Tarjeta principal del widget */
+    /* Tarjeta del widget */
     .widget-card {
       position: relative;
       width: 100%;
       max-width: 650px;
       padding: 20px 24px;
-      background-color: #f7f6f0; /* Color beige/verde claro de la referencia */
+      background-color: #f7f6f0;
       border-radius: 16px;
       display: flex;
       flex-direction: column;
@@ -50,34 +50,32 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
 
-    /* Botón de configuración flotante ⚙️ */
+    /* Botón ⚙️ visible y siempre accesible */
     .config-btn {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 20;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(0, 0, 0, 0.1);
+      top: 8px;
+      right: 8px;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.12);
       border-radius: 50%;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 15px;
-      opacity: 0; /* Oculto por defecto, aparece al hover */
+      font-size: 14px;
+      opacity: 0.7;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
-    .widget-card:hover .config-btn,
     .config-btn:hover {
       opacity: 1;
-      transform: scale(1.05);
+      transform: scale(1.1);
     }
 
-    /* Fila del Título */
+    /* Título */
     .title-row {
       display: flex;
       align-items: center;
@@ -98,18 +96,16 @@
       font-weight: bold;
       color: #6b8e4e;
       outline: none;
-      border: 1px transparentized;
       border-radius: 6px;
       padding: 2px 8px;
       text-align: center;
-      transition: background-color 0.2s ease;
     }
 
     .main-title:hover, .main-title:focus {
       background-color: rgba(107, 142, 78, 0.1);
     }
 
-    /* Fila Inferior: Fecha + Texto */
+    /* Subtítulo y Fecha */
     .subheader-row {
       display: flex;
       justify-content: space-between;
@@ -118,11 +114,6 @@
       max-width: 480px;
       margin-top: 4px;
       padding: 0 8px;
-    }
-
-    .date-container {
-      display: flex;
-      align-items: center;
     }
 
     .date-input {
@@ -145,21 +136,20 @@
       text-align: right;
       padding: 2px 6px;
       border-radius: 4px;
-      transition: background-color 0.2s ease;
     }
 
     .right-text:hover, .right-text:focus {
       background-color: rgba(107, 142, 78, 0.1);
     }
 
-    /* Modal de Ajustes */
+    /* Ventana Modal de Ajustes */
     .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.35);
+      background: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
@@ -180,7 +170,7 @@
       padding: 20px;
       border-radius: 14px;
       width: 90%;
-      max-width: 380px;
+      max-width: 360px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     }
 
@@ -204,7 +194,7 @@
       color: #555;
     }
 
-    .form-group select, .form-group input {
+    .form-group select {
       width: 100%;
       padding: 8px 10px;
       border: 1px solid #ddd;
@@ -237,16 +227,17 @@
 <body>
 
   <div class="widget-card font-serif" id="widgetCard">
-    <button class="config-btn" id="openModalBtn" title="Ajustes">⚙️</button>
+    <!-- Botón visible en la esquina superior derecha -->
+    <button class="config-btn" id="openModalBtn" title="Ajustes de fuente">⚙️</button>
 
-    <!-- Fila del Título -->
+    <!-- Título -->
     <div class="title-row">
       <span class="icon-side">🍄</span>
       <div class="main-title" id="mainTitle" contenteditable="true" spellcheck="false">Title Here</div>
       <span class="icon-side">🍄</span>
     </div>
 
-    <!-- Fila Inferior: Fecha (Izquierda) + Texto (Derecha) -->
+    <!-- Fecha y Subtítulo -->
     <div class="subheader-row">
       <div class="date-container">
         <input type="date" class="date-input font-serif" id="datePicker">
@@ -255,18 +246,18 @@
     </div>
   </div>
 
-  <!-- Modal de Configuración -->
+  <!-- Modal de Selección de Fuente -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <h2>Ajustes del Widget</h2>
+      <h2>Cambiar Tipografía</h2>
       
       <div class="form-group">
-        <label for="fontSelect">Tipo de Fuente:</label>
+        <label for="fontSelect">Elige un estilo de letra:</label>
         <select id="fontSelect">
           <option value="font-serif">Georgia (Serif Clásica)</option>
           <option value="font-playfair">Playfair Display (Elegante)</option>
           <option value="font-sans">Inter (Sans-Serif Moderna)</option>
-          <option value="font-mono">Courier (Monospace / Retro)</option>
+          <option value="font-mono">Courier (Retro / Monospace)</option>
           <option value="font-script">Dancing Script (Cursiva Estética)</option>
         </select>
       </div>
@@ -291,7 +282,7 @@
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Cargar preferencias guardadas
+    // Cargar opciones guardadas
     let currentFont = localStorage.getItem('hdr_font') || 'font-serif';
     mainTitle.innerText = localStorage.getItem('hdr_title') || 'Title Here';
     datePicker.value = localStorage.getItem('hdr_date') || today;
@@ -304,13 +295,14 @@
 
     applyFont(currentFont);
 
-    // Eventos de guardado automático de contenido
+    // Guardado automático de textos e insumos
     mainTitle.addEventListener('input', () => localStorage.setItem('hdr_title', mainTitle.innerText));
     datePicker.addEventListener('change', () => localStorage.setItem('hdr_date', datePicker.value));
     subText.addEventListener('input', () => localStorage.setItem('hdr_text', subText.innerText));
 
-    // Abrir/Cerrar Modal
-    openModalBtn.addEventListener('click', () => {
+    // Control del Modal
+    openModalBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       fontSelect.value = currentFont;
       modalOverlay.classList.add('active');
     });

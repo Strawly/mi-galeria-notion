@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notion Header Widget</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: transparent !important;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .widget-card {
+      width: 100%;
+      max-width: 650px;
+      padding: 24px;
+      background-color: #f7f6f0; /* Fondo beige claro como en la imagen */
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    /* Sección Superior: Título con íconos decorativos */
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
+    .icon-side {
+      font-size: 22px;
+      color: #6b8e4e; /* Verde oliva de la referencia */
+      user-select: none;
+    }
+
+    .main-title {
+      font-size: 42px;
+      font-weight: bold;
+      color: #6b8e4e;
+      outline: none;
+      border: 1px transparentized;
+      border-radius: 6px;
+      padding: 2px 8px;
+      text-align: center;
+      transition: background-color 0.2s ease;
+    }
+
+    .main-title:hover, .main-title:focus {
+      background-color: rgba(107, 142, 78, 0.1);
+    }
+
+    /* Sección Inferior: Fecha e Input de Texto en la misma línea */
+    .subheader-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 480px;
+      margin-top: 4px;
+      padding: 0 10px;
+    }
+
+    /* Lado Izquierdo: Fecha */
+    .date-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .date-input {
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      font-size: 16px;
+      color: #8fa376;
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Lado Derecho: Texto / Subtítulo */
+    .text-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .right-text {
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      font-size: 16px;
+      color: #8fa376;
+      outline: none;
+      border: none;
+      background: transparent;
+      text-align: right;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+    }
+
+    .right-text:hover, .right-text:focus {
+      background-color: rgba(107, 142, 78, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="widget-card">
+    <!-- Fila Superior: Título -->
+    <div class="title-row">
+      <span class="icon-side">🍄</span>
+      <div class="main-title" id="mainTitle" contenteditable="true" spellcheck="false">Title Here</div>
+      <span class="icon-side">🍄</span>
+    </div>
+
+    <!-- Fila Inferior: Fecha a la izquierda | Texto a la derecha -->
+    <div class="subheader-row">
+      <!-- Lado Izquierdo: Fecha -->
+      <div class="date-container">
+        <input type="date" class="date-input" id="datePicker">
+      </div>
+
+      <!-- Lado Derecho: Campo editable de texto -->
+      <div class="text-container">
+        <div class="right-text" id="subText" contenteditable="true" spellcheck="false">Insert subheader here</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const mainTitle = document.getElementById('mainTitle');
+    const datePicker = document.getElementById('datePicker');
+    const subText = document.getElementById('subText');
+
+    // Cargar la fecha actual por defecto en formato YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
+
+    // Cargar datos guardados
+    mainTitle.innerText = localStorage.getItem('header_title') || 'Title Here';
+    datePicker.value = localStorage.getItem('header_date') || today;
+    subText.innerText = localStorage.getItem('header_text') || 'Insert subheader here';
+
+    // Eventos para guardar datos automáticamente al escribir o cambiar
+    mainTitle.addEventListener('input', () => {
+      localStorage.setItem('header_title', mainTitle.innerText);
+    });
+
+    datePicker.addEventListener('change', () => {
+      localStorage.setItem('header_date', datePicker.value);
+    });
+
+    subText.addEventListener('input', () => {
+      localStorage.setItem('header_text', subText.innerText);
+    });
+  </script>
+</body>
+</html>

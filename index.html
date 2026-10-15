@@ -5,38 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notion Photo Gallery Widget</title>
   <style>
-    /* Eliminación estricta de bordes y márgenes blancos */
+    /* 1. Eliminación total del margen del body e iframe de Notion */
     html, body {
       margin: 0 !important;
       padding: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
+      width: 100vw;
+      height: 100vh;
       background: transparent !important;
       background-color: transparent !important;
-      overflow: auto; /* Permite scroll si la pantalla es más pequeña que la galería */
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       box-sizing: border-box;
     }
 
     *, *:before, *:after {
-      box-sizing: inherit;
+      box-sizing: border-box;
     }
 
-    /* Contenedor principal con esquinas redondeadas y tamaño fijo estricto */
+    /* 2. Contenedor con TAMAÑO FIJO RÍGIDO (No responsivo) */
     .gallery-container {
       position: relative;
-      width: 100%;
-      min-width: 650px; /* Evita que las imágenes se colapsen o reduzcan su ancho */
-      height: 100%;
-      min-height: 440px; /* Mantiene la altura fija de la referencia */
+      width: 800px !important;  /* Ancho fijo permanente */
+      height: 500px !important; /* Alto fijo permanente */
+      min-width: 800px !important;
+      min-height: 500px !important;
+      max-width: 800px !important;
+      max-height: 500px !important;
       padding: 16px;
-      border-radius: 20px; /* Redondea la imagen de fondo para eliminar las esquinas blancas */
-      overflow: hidden; /* Recorta cualquier fondo blanco que sobresalga en las esquinas */
+      border-radius: 24px;
+      /* clip-path garantiza cortar cualquier fondo blanco exterior */
+      clip-path: inset(0 round 24px);
+      overflow: hidden !important;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     /* Botón flotante de configuración */
@@ -49,8 +57,8 @@
       backdrop-filter: blur(8px);
       border: 1px solid rgba(0, 0, 0, 0.15);
       border-radius: 50%;
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -67,19 +75,18 @@
       transform: scale(1.08);
     }
 
-    /* Cuadrícula idéntica fija que conserva el tamaño exacto */
+    /* 3. Cuadrícula de fotos fija con dimensiones exactas */
     .gallery-grid {
       display: grid;
       gap: 12px;
       width: 100%;
       height: 100%;
-      min-height: 400px;
     }
 
     .gallery-item {
       position: relative;
       overflow: hidden;
-      border-radius: 18px; /* Esquinas redondeadas interiores de las imágenes */
+      border-radius: 18px; /* Esquinas redondeadas internas */
       background-color: rgba(229, 229, 229, 0.4);
       width: 100%;
       height: 100%;
@@ -89,7 +96,7 @@
     .gallery-item img {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* Recorta las imágenes sin deformarlas ni estirarlas */
+      object-fit: cover;
       display: block;
       transition: transform 0.3s ease;
     }
@@ -98,7 +105,7 @@
       transform: scale(1.03);
     }
 
-    /* Diseños fijos por cantidad de imágenes */
+    /* Diseños por número de imágenes (Fixed Layout) */
     .grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
     .grid-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
 
@@ -109,7 +116,7 @@
 
     .grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
 
-    /* 5 imágenes con proporciones fijas exactas a la imagen de muestra */
+    /* 5 imágenes (Diseño idéntico a tu referencia) */
     .grid-5 { grid-template-columns: 2.1fr 1fr 1fr; grid-template-rows: 1.35fr 1fr; }
     .grid-5 .item-0 { grid-column: 1 / 3; grid-row: 1 / 2; }
     .grid-5 .item-1 { grid-column: 3 / 4; grid-row: 1 / 2; }

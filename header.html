@@ -7,10 +7,10 @@
   <!-- Fuentes desde Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 
   <style>
-    /* Reset total y transparencia para evitar marcos blancos en Notion */
+    /* Reset total y transparencia estricta */
     html, body {
       margin: 0 !important;
       padding: 0 !important;
@@ -23,6 +23,7 @@
       justify-content: center;
       align-items: center;
       box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
     }
 
     *, *:before, *:after {
@@ -46,7 +47,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
       transition: background 0.3s ease, color 0.3s ease;
     }
 
@@ -57,7 +58,7 @@
       right: 10px;
       z-index: 50;
       background: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 50%;
       width: 30px;
       height: 30px;
@@ -66,7 +67,7 @@
       justify-content: center;
       cursor: pointer;
       font-size: 14px;
-      opacity: 0.7;
+      opacity: 0.6;
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
@@ -101,7 +102,7 @@
     }
 
     .main-title:hover, .main-title:focus {
-      background-color: rgba(0, 0, 0, 0.05);
+      background-color: rgba(0, 0, 0, 0.04);
     }
 
     /* Fila Inferior: Fecha + Texto */
@@ -137,25 +138,27 @@
     }
 
     .right-text:hover, .right-text:focus {
-      background-color: rgba(0, 0, 0, 0.05);
+      background-color: rgba(0, 0, 0, 0.04);
     }
 
-    /* Ventana Modal */
+    /* -------------------------------------------------------------
+       🎨 NUEVO MENÚ DE CONFIGURACIÓN (MODAL ESTÉTICO)
+    ------------------------------------------------------------- */
     .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 100;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.25 ease;
     }
 
     .modal-overlay.active {
@@ -165,61 +168,108 @@
 
     .modal {
       background: #ffffff;
-      padding: 22px;
-      border-radius: 16px;
+      padding: 24px;
+      border-radius: 20px;
       width: 90%;
       max-width: 380px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+      transform: translateY(10px);
+      transition: transform 0.25s ease;
+      font-family: 'Inter', sans-serif;
     }
 
-    .modal h2 {
-      font-size: 16px;
-      margin-bottom: 14px;
-      color: #333;
-      font-family: sans-serif;
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .modal-header h2 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #2c3e2e;
+    }
+
+    .modal-subtitle {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 18px;
     }
 
     .form-group {
-      margin-bottom: 12px;
-      font-family: sans-serif;
+      margin-bottom: 14px;
     }
 
     .form-group label {
       display: block;
       font-size: 12px;
       font-weight: 600;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .form-group select, .form-group input {
       width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
       font-size: 13px;
+      color: #333;
+      background-color: #f8fafc;
       outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-group select:focus, .form-group input:focus {
+      border-color: #6b8e4e;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(107, 142, 78, 0.15);
     }
 
     .modal-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 8px;
-      margin-top: 18px;
+      gap: 10px;
+      margin-top: 22px;
     }
 
     .btn {
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 12px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       border: none;
-      font-family: sans-serif;
+      transition: all 0.2s ease;
     }
 
-    .btn-secondary { background: #f0f0f0; color: #333; }
-    .btn-primary { background: #6b8e4e; color: #fff; }
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .btn-primary {
+      background: #6b8e4e;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(107, 142, 78, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #5a7a40;
+      transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
@@ -243,18 +293,22 @@
     </div>
   </div>
 
-  <!-- Modal de Personalización -->
+  <!-- Modal de Configuración Rediseñado -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <h2>Personalizar Widget</h2>
+      <div class="modal-header">
+        <span>⚙️</span>
+        <h2>Personalizar Header</h2>
+      </div>
+      <p class="modal-subtitle">Ajusta la fuente y paleta de colores de tu widget.</p>
       
       <!-- Selector de Fuente -->
       <div class="form-group">
-        <label for="fontSelect">Tipo de Fuente:</label>
+        <label for="fontSelect">Tipografía</label>
         <select id="fontSelect">
           <option value="font-serif">Georgia (Serif Clásica)</option>
           <option value="font-playfair">Playfair Display (Elegante)</option>
-          <option value="font-sans">Inter (Sans-Serif Moderna)</option>
+          <option value="font-sans">Inter (Moderna / Limpia)</option>
           <option value="font-mono">Courier (Retro / Monospace)</option>
           <option value="font-script">Dancing Script (Cursiva Estética)</option>
         </select>
@@ -262,7 +316,7 @@
 
       <!-- Selector de Paleta / Tema -->
       <div class="form-group">
-        <label for="themeSelect">Paleta de Color / Gradiente:</label>
+        <label for="themeSelect">Color / Gradiente</label>
         <select id="themeSelect">
           <option value="sage">Verde Oliva & Beige (Original)</option>
           <option value="blush">Rosa Pastel & Nude</option>
@@ -270,19 +324,19 @@
           <option value="grad-sunset">Gradiente Atardecer (Rosa-Naranja)</option>
           <option value="grad-aurora">Gradiente Aurora (Verde-Azul)</option>
           <option value="grad-lavender">Gradiente Lavanda (Púrpura-Rosa)</option>
-          <option value="custom">Personalizado (Ingresar Color/HEX)</option>
+          <option value="custom">Personalizado (Ingresar Color CSS)</option>
         </select>
       </div>
 
       <!-- Campo de color personalizado -->
       <div class="form-group" id="customColorGroup" style="display: none;">
-        <label for="customBgInput">Color o Gradiente CSS:</label>
+        <label for="customBgInput">Código de Color / Gradiente</label>
         <input type="text" id="customBgInput" placeholder="#f7f6f0 o linear-gradient(...)">
       </div>
 
       <div class="modal-actions">
         <button class="btn btn-secondary" id="closeModalBtn">Cancelar</button>
-        <button class="btn btn-primary" id="saveBtn">Guardar</button>
+        <button class="btn btn-primary" id="saveBtn">Guardar Cambios</button>
       </div>
     </div>
   </div>
@@ -352,11 +406,7 @@
 
     // Mostrar/ocultar input personalizado en modal
     themeSelect.addEventListener('change', () => {
-      if (themeSelect.value === 'custom') {
-        customColorGroup.style.display = 'block';
-      } else {
-        customColorGroup.style.display = 'none';
-      }
+      customColorGroup.style.display = themeSelect.value === 'custom' ? 'block' : 'none';
     });
 
     // Abrir Modal

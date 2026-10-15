@@ -19,6 +19,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      overflow: hidden;
     }
 
     .gallery-container {
@@ -90,7 +91,7 @@
       transform: scale(1.03);
     }
 
-    /* Diseños por cantidad de imágenes */
+    /* Diseños según la cantidad de imágenes */
     .grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
     .grid-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
 
@@ -242,15 +243,27 @@
       "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=600&q=80"
     ];
 
-    // Leer parámetros desde la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    let count = parseInt(urlParams.get('count')) || 5;
-    let bgUrl = urlParams.get('bg') || '';
-    let images = [];
-
-    for (let i = 0; i < count; i++) {
-      images[i] = urlParams.get(`img${i + 1}`) || defaults[i % defaults.length];
+    // Funciones auxiliares para guardar datos sin errores de iframe
+    function getStoredData(key, fallback) {
+      try {
+        const val = localStorage.getItem(key);
+        return val !== null ? JSON.parse(val) : fallback;
+      } catch (e) {
+        return fallback;
+      }
     }
+
+    function setStoredData(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch (e) {
+        console.warn('LocalStorage inaccesible:', e);
+      }
+    }
+
+    let count = getStoredData('notion_gal_count', 5);
+    let images = getStoredData('notion_gal_images', []);
+    let bgUrl = getStoredData('notion_gal_bg', '');
 
     const galleryContainer = document.getElementById('galleryContainer');
     const galleryGrid = document.getElementById('galleryGrid');
@@ -277,7 +290,9 @@
         item.className = `gallery-item item-${i}`;
 
         const img = document.createElement('img');
-        img.src = images[i] && images[i].trim() !== '' ? images[i] : defaults[i % defaults.length];
+        const srcToUse = (images[i] && images[i].trim() !== '') ? images[i] : defaults[i % defaults.length];
+        
+        img.src = srcToUse;
         img.alt = `Foto ${i + 1}`;
         img.onerror = function() {
           this.src = defaults[i % defaults.length];
@@ -325,32 +340,26 @@
     imageCountSelect.addEventListener('change', renderInputs);
 
     saveBtn.addEventListener('click', () => {
-      const newCount = parseInt(imageCountSelect.value);
-      const newBg = bgInput.value.trim();
-      const inputElements = urlInputsContainer.querySelectorAll('.url-input-item');
+      count = parseInt(imageCountSelect.value);
+      bgUrl = bgInput.value.trim();
 
-      // Generar nueva URL con parámetros guardados
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set('count', newCount);
-      
-      if (newBg) {
-        newUrl.searchParams.set('bg', newBg);
-      } else {
-        newUrl.searchParams.delete('bg');
-      }
+      const inputElements = urlInputsContainer.querySelectorAll('.url-input-item');
+      images = [];
 
       inputElements.forEach((input, idx) => {
-        if (input.value.trim()) {
-          newUrl.searchParams.set(`img${idx + 1}`, input.value.trim());
-        } else {
-          newUrl.searchParams.delete(`img${idx + 1}`);
-        }
+        images[idx] = input.value.trim();
       });
 
-      // Redireccionar a la nueva URL guardada
-      window.location.href = newUrl.toString();
+      // Guardar permanentemente en almacenamiento local
+      setStoredData('notion_gal_count', count);
+      setStoredData('notion_gal_images', images);
+      setStoredData('notion_gal_bg', bgUrl);
+
+      renderGallery();
+      modalOverlay.classList.remove('active');
     });
 
+    // Renderizar al cargar
     renderGallery();
   </script>
 </body>

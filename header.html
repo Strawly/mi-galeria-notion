@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 
   <style>
-    /* Reset de márgenes y transparencia */
+    /* Reset total y transparencia para evitar marcos blancos en Notion */
     html, body {
       margin: 0 !important;
       padding: 0 !important;
@@ -29,38 +29,38 @@
       box-sizing: border-box;
     }
 
-    /* Clases de tipografías */
+    /* Tipografías */
     .font-serif { font-family: 'Georgia', 'Times New Roman', serif; }
     .font-sans { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
     .font-mono { font-family: 'Courier New', Courier, monospace; }
     .font-playfair { font-family: 'Playfair Display', serif; }
     .font-script { font-family: 'Dancing Script', cursive; }
 
-    /* Tarjeta del widget */
+    /* Tarjeta Principal */
     .widget-card {
       position: relative;
       width: 100%;
       max-width: 650px;
-      padding: 20px 24px;
-      background-color: #f7f6f0;
-      border-radius: 16px;
+      padding: 22px 26px;
+      border-radius: 18px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* Botón ⚙️ visible y siempre accesible */
+    /* Botón ⚙️ visible */
     .config-btn {
       position: absolute;
-      top: 8px;
-      right: 8px;
+      top: 10px;
+      right: 10px;
       z-index: 50;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(0, 0, 0, 0.12);
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 50%;
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -75,7 +75,7 @@
       transform: scale(1.1);
     }
 
-    /* Título */
+    /* Fila del Título */
     .title-row {
       display: flex;
       align-items: center;
@@ -87,25 +87,24 @@
 
     .icon-side {
       font-size: 22px;
-      color: #6b8e4e;
       user-select: none;
     }
 
     .main-title {
       font-size: 38px;
       font-weight: bold;
-      color: #6b8e4e;
       outline: none;
       border-radius: 6px;
       padding: 2px 8px;
       text-align: center;
+      transition: background-color 0.2s ease;
     }
 
     .main-title:hover, .main-title:focus {
-      background-color: rgba(107, 142, 78, 0.1);
+      background-color: rgba(0, 0, 0, 0.05);
     }
 
-    /* Subtítulo y Fecha */
+    /* Fila Inferior: Fecha + Texto */
     .subheader-row {
       display: flex;
       justify-content: space-between;
@@ -119,7 +118,6 @@
     .date-input {
       font-style: italic;
       font-size: 15px;
-      color: #8fa376;
       background: transparent;
       border: none;
       outline: none;
@@ -129,20 +127,20 @@
     .right-text {
       font-style: italic;
       font-size: 15px;
-      color: #8fa376;
       outline: none;
       border: none;
       background: transparent;
       text-align: right;
       padding: 2px 6px;
       border-radius: 4px;
+      transition: background-color 0.2s ease;
     }
 
     .right-text:hover, .right-text:focus {
-      background-color: rgba(107, 142, 78, 0.1);
+      background-color: rgba(0, 0, 0, 0.05);
     }
 
-    /* Ventana Modal de Ajustes */
+    /* Ventana Modal */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -167,10 +165,10 @@
 
     .modal {
       background: #ffffff;
-      padding: 20px;
-      border-radius: 14px;
+      padding: 22px;
+      border-radius: 16px;
       width: 90%;
-      max-width: 360px;
+      max-width: 380px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     }
 
@@ -194,7 +192,7 @@
       color: #555;
     }
 
-    .form-group select {
+    .form-group select, .form-group input {
       width: 100%;
       padding: 8px 10px;
       border: 1px solid #ddd;
@@ -207,11 +205,11 @@
       display: flex;
       justify-content: flex-end;
       gap: 8px;
-      margin-top: 16px;
+      margin-top: 18px;
     }
 
     .btn {
-      padding: 7px 14px;
+      padding: 8px 14px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
@@ -227,14 +225,13 @@
 <body>
 
   <div class="widget-card font-serif" id="widgetCard">
-    <!-- Botón visible en la esquina superior derecha -->
-    <button class="config-btn" id="openModalBtn" title="Ajustes de fuente">⚙️</button>
+    <button class="config-btn" id="openModalBtn" title="Ajustes">⚙️</button>
 
     <!-- Título -->
     <div class="title-row">
-      <span class="icon-side">🍄</span>
+      <span class="icon-side" id="iconLeft">🍄</span>
       <div class="main-title" id="mainTitle" contenteditable="true" spellcheck="false">Title Here</div>
-      <span class="icon-side">🍄</span>
+      <span class="icon-side" id="iconRight">🍄</span>
     </div>
 
     <!-- Fecha y Subtítulo -->
@@ -246,13 +243,14 @@
     </div>
   </div>
 
-  <!-- Modal de Selección de Fuente -->
+  <!-- Modal de Personalización -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <h2>Cambiar Tipografía</h2>
+      <h2>Personalizar Widget</h2>
       
+      <!-- Selector de Fuente -->
       <div class="form-group">
-        <label for="fontSelect">Elige un estilo de letra:</label>
+        <label for="fontSelect">Tipo de Fuente:</label>
         <select id="fontSelect">
           <option value="font-serif">Georgia (Serif Clásica)</option>
           <option value="font-playfair">Playfair Display (Elegante)</option>
@@ -260,6 +258,26 @@
           <option value="font-mono">Courier (Retro / Monospace)</option>
           <option value="font-script">Dancing Script (Cursiva Estética)</option>
         </select>
+      </div>
+
+      <!-- Selector de Paleta / Tema -->
+      <div class="form-group">
+        <label for="themeSelect">Paleta de Color / Gradiente:</label>
+        <select id="themeSelect">
+          <option value="sage">Verde Oliva & Beige (Original)</option>
+          <option value="blush">Rosa Pastel & Nude</option>
+          <option value="sky">Azul Celeste & Menta</option>
+          <option value="grad-sunset">Gradiente Atardecer (Rosa-Naranja)</option>
+          <option value="grad-aurora">Gradiente Aurora (Verde-Azul)</option>
+          <option value="grad-lavender">Gradiente Lavanda (Púrpura-Rosa)</option>
+          <option value="custom">Personalizado (Ingresar Color/HEX)</option>
+        </select>
+      </div>
+
+      <!-- Campo de color personalizado -->
+      <div class="form-group" id="customColorGroup" style="display: none;">
+        <label for="customBgInput">Color o Gradiente CSS:</label>
+        <input type="text" id="customBgInput" placeholder="#f7f6f0 o linear-gradient(...)">
       </div>
 
       <div class="modal-actions">
@@ -270,6 +288,7 @@
   </div>
 
   <script>
+    // Referencias al DOM
     const widgetCard = document.getElementById('widgetCard');
     const mainTitle = document.getElementById('mainTitle');
     const datePicker = document.getElementById('datePicker');
@@ -279,42 +298,92 @@
     const closeModalBtn = document.getElementById('closeModalBtn');
     const saveBtn = document.getElementById('saveBtn');
     const fontSelect = document.getElementById('fontSelect');
+    const themeSelect = document.getElementById('themeSelect');
+    const customColorGroup = document.getElementById('customColorGroup');
+    const customBgInput = document.getElementById('customBgInput');
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Cargar opciones guardadas
+    // Presets de Paletas y Gradientes
+    const themes = {
+      'sage': { bg: '#f7f6f0', text: '#6b8e4e', subtext: '#8fa376' },
+      'blush': { bg: '#fdf3f2', text: '#b86b77', subtext: '#c98a94' },
+      'sky': { bg: '#f0f7f9', text: '#4a7c8e', subtext: '#729ea8' },
+      'grad-sunset': { bg: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', text: '#4a3e56', subtext: '#685977' },
+      'grad-aurora': { bg: 'linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)', text: '#2d5233', subtext: '#3d6d45' },
+      'grad-lavender': { bg: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', text: '#433854', subtext: '#5b4d70' }
+    };
+
+    // Cargar datos
     let currentFont = localStorage.getItem('hdr_font') || 'font-serif';
+    let currentTheme = localStorage.getItem('hdr_theme') || 'sage';
+    let customBg = localStorage.getItem('hdr_custom_bg') || '#f7f6f0';
+
     mainTitle.innerText = localStorage.getItem('hdr_title') || 'Title Here';
     datePicker.value = localStorage.getItem('hdr_date') || today;
     subText.innerText = localStorage.getItem('hdr_text') || 'Insert subheader here';
 
-    function applyFont(fontClass) {
+    function applyStyles(fontClass, themeKey, customVal) {
       widgetCard.className = `widget-card ${fontClass}`;
       datePicker.className = `date-input ${fontClass}`;
+
+      if (themeKey === 'custom') {
+        widgetCard.style.background = customVal;
+        widgetCard.style.color = '#333';
+        mainTitle.style.color = '#333';
+        datePicker.style.color = '#666';
+        subText.style.color = '#666';
+      } else {
+        const theme = themes[themeKey] || themes['sage'];
+        widgetCard.style.background = theme.bg;
+        widgetCard.style.color = theme.text;
+        mainTitle.style.color = theme.text;
+        datePicker.style.color = theme.subtext;
+        subText.style.color = theme.subtext;
+      }
     }
 
-    applyFont(currentFont);
+    applyStyles(currentFont, currentTheme, customBg);
 
-    // Guardado automático de textos e insumos
+    // Guardado de textos
     mainTitle.addEventListener('input', () => localStorage.setItem('hdr_title', mainTitle.innerText));
     datePicker.addEventListener('change', () => localStorage.setItem('hdr_date', datePicker.value));
     subText.addEventListener('input', () => localStorage.setItem('hdr_text', subText.innerText));
 
-    // Control del Modal
-    openModalBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
+    // Mostrar/ocultar input personalizado en modal
+    themeSelect.addEventListener('change', () => {
+      if (themeSelect.value === 'custom') {
+        customColorGroup.style.display = 'block';
+      } else {
+        customColorGroup.style.display = 'none';
+      }
+    });
+
+    // Abrir Modal
+    openModalBtn.addEventListener('click', () => {
       fontSelect.value = currentFont;
+      themeSelect.value = currentTheme;
+      customBgInput.value = customBg;
+      customColorGroup.style.display = currentTheme === 'custom' ? 'block' : 'none';
       modalOverlay.classList.add('active');
     });
 
+    // Cerrar Modal
     closeModalBtn.addEventListener('click', () => {
       modalOverlay.classList.remove('active');
     });
 
+    // Guardar Modal
     saveBtn.addEventListener('click', () => {
       currentFont = fontSelect.value;
+      currentTheme = themeSelect.value;
+      customBg = customBgInput.value.trim() || '#f7f6f0';
+
       localStorage.setItem('hdr_font', currentFont);
-      applyFont(currentFont);
+      localStorage.setItem('hdr_theme', currentTheme);
+      localStorage.setItem('hdr_custom_bg', customBg);
+
+      applyStyles(currentFont, currentTheme, customBg);
       modalOverlay.classList.remove('active');
     });
   </script>

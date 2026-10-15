@@ -4,29 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notion Header Widget</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  <!-- Fuentes estéticas desde Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 
+  <style>
+    /* Reset total y transparencia estricta para evitar cuadros blancos en Notion */
     html, body {
-      width: 100%;
-      height: 100%;
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background: transparent !important;
       background-color: transparent !important;
-      font-family: 'Georgia', 'Times New Roman', serif;
+      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
+      box-sizing: border-box;
     }
 
+    *, *:before, *:after {
+      box-sizing: border-box;
+    }
+
+    /* Clases de fuentes seleccionables */
+    .font-serif { font-family: 'Georgia', 'Times New Roman', serif; }
+    .font-sans { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .font-mono { font-family: 'Courier New', Courier, monospace; }
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    .font-script { font-family: 'Dancing Script', cursive; }
+
+    /* Tarjeta principal del widget */
     .widget-card {
+      position: relative;
       width: 100%;
       max-width: 650px;
-      padding: 24px;
-      background-color: #f7f6f0; /* Fondo beige claro como en la imagen */
+      padding: 20px 24px;
+      background-color: #f7f6f0; /* Color beige/verde claro de la referencia */
       border-radius: 16px;
       display: flex;
       flex-direction: column;
@@ -34,24 +50,51 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
 
-    /* Sección Superior: Título con íconos decorativos */
+    /* Botón de configuración flotante ⚙️ */
+    .config-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      opacity: 0; /* Oculto por defecto, aparece al hover */
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .widget-card:hover .config-btn,
+    .config-btn:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    /* Fila del Título */
     .title-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 20px;
+      gap: 16px;
       width: 100%;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .icon-side {
       font-size: 22px;
-      color: #6b8e4e; /* Verde oliva de la referencia */
+      color: #6b8e4e;
       user-select: none;
     }
 
     .main-title {
-      font-size: 42px;
+      font-size: 38px;
       font-weight: bold;
       color: #6b8e4e;
       outline: none;
@@ -66,7 +109,7 @@
       background-color: rgba(107, 142, 78, 0.1);
     }
 
-    /* Sección Inferior: Fecha e Input de Texto en la misma línea */
+    /* Fila Inferior: Fecha + Texto */
     .subheader-row {
       display: flex;
       justify-content: space-between;
@@ -74,19 +117,17 @@
       width: 100%;
       max-width: 480px;
       margin-top: 4px;
-      padding: 0 10px;
+      padding: 0 8px;
     }
 
-    /* Lado Izquierdo: Fecha */
     .date-container {
       display: flex;
       align-items: center;
     }
 
     .date-input {
-      font-family: 'Georgia', serif;
       font-style: italic;
-      font-size: 16px;
+      font-size: 15px;
       color: #8fa376;
       background: transparent;
       border: none;
@@ -94,16 +135,9 @@
       cursor: pointer;
     }
 
-    /* Lado Derecho: Texto / Subtítulo */
-    .text-container {
-      display: flex;
-      align-items: center;
-    }
-
     .right-text {
-      font-family: 'Georgia', serif;
       font-style: italic;
-      font-size: 16px;
+      font-size: 15px;
       color: #8fa376;
       outline: none;
       border: none;
@@ -117,56 +151,179 @@
     .right-text:hover, .right-text:focus {
       background-color: rgba(107, 142, 78, 0.1);
     }
+
+    /* Modal de Ajustes */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 14px;
+      width: 90%;
+      max-width: 380px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal h2 {
+      font-size: 16px;
+      margin-bottom: 14px;
+      color: #333;
+      font-family: sans-serif;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      font-family: sans-serif;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #555;
+    }
+
+    .form-group select, .form-group input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: sans-serif;
+    }
+
+    .btn-secondary { background: #f0f0f0; color: #333; }
+    .btn-primary { background: #6b8e4e; color: #fff; }
   </style>
 </head>
 <body>
 
-  <div class="widget-card">
-    <!-- Fila Superior: Título -->
+  <div class="widget-card font-serif" id="widgetCard">
+    <button class="config-btn" id="openModalBtn" title="Ajustes">⚙️</button>
+
+    <!-- Fila del Título -->
     <div class="title-row">
       <span class="icon-side">🍄</span>
       <div class="main-title" id="mainTitle" contenteditable="true" spellcheck="false">Title Here</div>
       <span class="icon-side">🍄</span>
     </div>
 
-    <!-- Fila Inferior: Fecha a la izquierda | Texto a la derecha -->
+    <!-- Fila Inferior: Fecha (Izquierda) + Texto (Derecha) -->
     <div class="subheader-row">
-      <!-- Lado Izquierdo: Fecha -->
       <div class="date-container">
-        <input type="date" class="date-input" id="datePicker">
+        <input type="date" class="date-input font-serif" id="datePicker">
+      </div>
+      <div class="right-text" id="subText" contenteditable="true" spellcheck="false">Insert subheader here</div>
+    </div>
+  </div>
+
+  <!-- Modal de Configuración -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2>Ajustes del Widget</h2>
+      
+      <div class="form-group">
+        <label for="fontSelect">Tipo de Fuente:</label>
+        <select id="fontSelect">
+          <option value="font-serif">Georgia (Serif Clásica)</option>
+          <option value="font-playfair">Playfair Display (Elegante)</option>
+          <option value="font-sans">Inter (Sans-Serif Moderna)</option>
+          <option value="font-mono">Courier (Monospace / Retro)</option>
+          <option value="font-script">Dancing Script (Cursiva Estética)</option>
+        </select>
       </div>
 
-      <!-- Lado Derecho: Campo editable de texto -->
-      <div class="text-container">
-        <div class="right-text" id="subText" contenteditable="true" spellcheck="false">Insert subheader here</div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="closeModalBtn">Cancelar</button>
+        <button class="btn btn-primary" id="saveBtn">Guardar</button>
       </div>
     </div>
   </div>
 
   <script>
+    const widgetCard = document.getElementById('widgetCard');
     const mainTitle = document.getElementById('mainTitle');
     const datePicker = document.getElementById('datePicker');
     const subText = document.getElementById('subText');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const fontSelect = document.getElementById('fontSelect');
 
-    // Cargar la fecha actual por defecto en formato YYYY-MM-DD
     const today = new Date().toISOString().split('T')[0];
 
-    // Cargar datos guardados
-    mainTitle.innerText = localStorage.getItem('header_title') || 'Title Here';
-    datePicker.value = localStorage.getItem('header_date') || today;
-    subText.innerText = localStorage.getItem('header_text') || 'Insert subheader here';
+    // Cargar preferencias guardadas
+    let currentFont = localStorage.getItem('hdr_font') || 'font-serif';
+    mainTitle.innerText = localStorage.getItem('hdr_title') || 'Title Here';
+    datePicker.value = localStorage.getItem('hdr_date') || today;
+    subText.innerText = localStorage.getItem('hdr_text') || 'Insert subheader here';
 
-    // Eventos para guardar datos automáticamente al escribir o cambiar
-    mainTitle.addEventListener('input', () => {
-      localStorage.setItem('header_title', mainTitle.innerText);
+    function applyFont(fontClass) {
+      widgetCard.className = `widget-card ${fontClass}`;
+      datePicker.className = `date-input ${fontClass}`;
+    }
+
+    applyFont(currentFont);
+
+    // Eventos de guardado automático de contenido
+    mainTitle.addEventListener('input', () => localStorage.setItem('hdr_title', mainTitle.innerText));
+    datePicker.addEventListener('change', () => localStorage.setItem('hdr_date', datePicker.value));
+    subText.addEventListener('input', () => localStorage.setItem('hdr_text', subText.innerText));
+
+    // Abrir/Cerrar Modal
+    openModalBtn.addEventListener('click', () => {
+      fontSelect.value = currentFont;
+      modalOverlay.classList.add('active');
     });
 
-    datePicker.addEventListener('change', () => {
-      localStorage.setItem('header_date', datePicker.value);
+    closeModalBtn.addEventListener('click', () => {
+      modalOverlay.classList.remove('active');
     });
 
-    subText.addEventListener('input', () => {
-      localStorage.setItem('header_text', subText.innerText);
+    saveBtn.addEventListener('click', () => {
+      currentFont = fontSelect.value;
+      localStorage.setItem('hdr_font', currentFont);
+      applyFont(currentFont);
+      modalOverlay.classList.remove('active');
     });
   </script>
 </body>

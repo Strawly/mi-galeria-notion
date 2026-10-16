@@ -4,24 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notion Header Widget</title>
-  <!-- Fuentes estéticas desde Google Fonts -->
+  <!-- Fuentes desde Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 
   <style>
-    /* Reset total y transparencia absoluta para eliminar marcos de página web */
+    /* Reset total y eliminación estricta de márgenes externos */
     html, body {
       margin: 0 !important;
       padding: 0 !important;
       width: 100% !important;
-      height: auto !important; /* Mantiene solo el tamaño real de la tarjeta */
+      height: 100% !important;
       background: transparent !important;
       background-color: transparent !important;
       overflow: hidden !important;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       box-sizing: border-box;
       font-family: 'Inter', sans-serif;
     }
@@ -30,29 +30,29 @@
       box-sizing: border-box;
     }
 
-    /* Tipografías seleccionables */
+    /* Tipografías */
     .font-serif { font-family: 'Georgia', 'Times New Roman', serif; }
     .font-sans { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
     .font-mono { font-family: 'Courier New', Courier, monospace; }
     .font-playfair { font-family: 'Playfair Display', serif; }
     .font-script { font-family: 'Dancing Script', cursive; }
 
-    /* Tarjeta integrada del widget */
+    /* Tarjeta que ocupa el 100% del ancho del contenedor en Notion */
     .widget-card {
       position: relative;
-      width: 100%;
-      max-width: 650px;
-      margin: 2px auto; /* Centrado estricto */
-      padding: 18px 24px;
+      width: 100% !important; /* Llena completamente el iFrame */
+      height: 100% !important;
+      padding: 16px 24px;
       border-radius: 18px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       box-shadow: 0 2px 10px rgba(0,0,0,0.03);
       transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* Botón ⚙️ de configuración */
+    /* Botón ⚙️ */
     .config-btn {
       position: absolute;
       top: 8px;
@@ -77,14 +77,14 @@
       transform: scale(1.1);
     }
 
-    /* Fila del Título */
+    /* Título */
     .title-row {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 16px;
       width: 100%;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .icon-side {
@@ -93,27 +93,26 @@
     }
 
     .main-title {
-      font-size: 38px;
+      font-size: 36px;
       font-weight: bold;
       outline: none;
       border-radius: 6px;
       padding: 2px 8px;
       text-align: center;
-      transition: background-color 0.2s ease;
     }
 
     .main-title:hover, .main-title:focus {
       background-color: rgba(0, 0, 0, 0.04);
     }
 
-    /* Fila Inferior: Fecha + Subtítulo */
+    /* Fecha y Subtítulo */
     .subheader-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      max-width: 480px;
-      margin-top: 4px;
+      max-width: 500px;
+      margin-top: 2px;
       padding: 0 8px;
     }
 
@@ -135,14 +134,13 @@
       text-align: right;
       padding: 2px 6px;
       border-radius: 4px;
-      transition: background-color 0.2s ease;
     }
 
     .right-text:hover, .right-text:focus {
       background-color: rgba(0, 0, 0, 0.04);
     }
 
-    /* Modal de Configuración */
+    /* Modal */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -241,7 +239,7 @@
 </head>
 <body>
 
-  <div class="widget-card font-serif" id="widgetCard">
+  <div class="widget-card font-script" id="widgetCard">
     <button class="config-btn" id="openModalBtn" title="Ajustes">⚙️</button>
 
     <!-- Título -->
@@ -254,7 +252,7 @@
     <!-- Fecha y Subtítulo -->
     <div class="subheader-row">
       <div class="date-container">
-        <input type="date" class="date-input font-serif" id="datePicker">
+        <input type="date" class="date-input font-script" id="datePicker">
       </div>
       <div class="right-text" id="subText" contenteditable="true" spellcheck="false">Insert subheader here</div>
     </div>
@@ -272,22 +270,22 @@
       <div class="form-group">
         <label for="fontSelect">Tipografía</label>
         <select id="fontSelect">
+          <option value="font-script">Dancing Script (Cursiva Estética)</option>
           <option value="font-serif">Georgia (Serif Clásica)</option>
           <option value="font-playfair">Playfair Display (Elegante)</option>
           <option value="font-sans">Inter (Moderna / Limpia)</option>
           <option value="font-mono">Courier (Retro / Monospace)</option>
-          <option value="font-script">Dancing Script (Cursiva Estética)</option>
         </select>
       </div>
 
       <div class="form-group">
         <label for="themeSelect">Color / Gradiente</label>
         <select id="themeSelect">
+          <option value="grad-aurora">Gradiente Aurora (Verde-Azul)</option>
           <option value="sage">Verde Oliva & Beige (Original)</option>
           <option value="blush">Rosa Pastel & Nude</option>
           <option value="sky">Azul Celeste & Menta</option>
           <option value="grad-sunset">Gradiente Atardecer (Rosa-Naranja)</option>
-          <option value="grad-aurora">Gradiente Aurora (Verde-Azul)</option>
           <option value="grad-lavender">Gradiente Lavanda (Púrpura-Rosa)</option>
           <option value="custom">Personalizado (Ingresar Color CSS)</option>
         </select>
@@ -330,8 +328,8 @@
       'grad-lavender': { bg: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', text: '#433854', subtext: '#5b4d70' }
     };
 
-    let currentFont = localStorage.getItem('hdr_font') || 'font-serif';
-    let currentTheme = localStorage.getItem('hdr_theme') || 'sage';
+    let currentFont = localStorage.getItem('hdr_font') || 'font-script';
+    let currentTheme = localStorage.getItem('hdr_theme') || 'grad-aurora';
     let customBg = localStorage.getItem('hdr_custom_bg') || '#f7f6f0';
 
     mainTitle.innerText = localStorage.getItem('hdr_title') || 'Title Here';
@@ -349,7 +347,7 @@
         datePicker.style.color = '#666';
         subText.style.color = '#666';
       } else {
-        const theme = themes[themeKey] || themes['sage'];
+        const theme = themes[themeKey] || themes['grad-aurora'];
         widgetCard.style.background = theme.bg;
         widgetCard.style.color = theme.text;
         mainTitle.style.color = theme.text;

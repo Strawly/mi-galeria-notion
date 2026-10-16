@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notion Social Profile Widget</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: auto;
+      background: transparent !important;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Tarjeta Principal */
+    .profile-card {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #e1e8ed;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      color: #14171a;
+    }
+
+    /* Botón Ajustes ⚙️ */
+    .config-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .config-btn:hover { opacity: 1; }
+
+    /* Barra Superior de Navegación */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      background: #ffffff;
+      border-bottom: 1px solid #f0f3f5;
+      font-size: 13px;
+      font-weight: 600;
+      color: #657786;
+    }
+
+    .nav-domain {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #4c5d73;
+    }
+
+    /* Banner y Avatar */
+    .banner-container {
+      position: relative;
+      width: 100%;
+      height: 120px;
+      background-color: #d1d5db;
+    }
+
+    .banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-container {
+      position: absolute;
+      bottom: -40px;
+      left: 16px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid #ffffff;
+      overflow: hidden;
+      background: #eee;
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Acciones del Perfil */
+    .profile-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 10px 16px 0 16px;
+    }
+
+    .action-btn {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid #cfd9de;
+      background: #0f1419;
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    /* Detalles del Perfil */
+    .profile-details {
+      padding: 8px 16px 16px 16px;
+    }
+
+    .profile-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .profile-name {
+      font-size: 18px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .profile-handle {
+      font-size: 13px;
+      color: #657786;
+      outline: none;
+      margin-bottom: 8px;
+    }
+
+    .profile-bio {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #14171a;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .profile-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: #657786;
+      margin-bottom: 8px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      outline: none;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: #657786;
+      border-bottom: 1px solid #f0f3f5;
+      padding-bottom: 12px;
+    }
+
+    .stat-val {
+      font-weight: 700;
+      color: #14171a;
+    }
+
+    /* Publicación Fijada (Pinned Post) */
+    .pinned-post {
+      padding: 12px 16px;
+      border-top: 1px solid #f0f3f5;
+    }
+
+    .pinned-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #657786;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .post-header {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .post-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .post-meta {
+      font-size: 13px;
+    }
+
+    .post-author {
+      font-weight: 700;
+      color: #14171a;
+    }
+
+    .post-time {
+      color: #657786;
+      font-weight: 400;
+    }
+
+    .post-text {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #14171a;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .post-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .grid-img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+    }
+
+    /* Modal de Ajustes */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%; max-width: 380px;
+      font-size: 13px;
+    }
+    .modal h2 { margin-bottom: 12px; font-size: 15px; }
+    .form-group { margin-bottom: 10px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 11px; }
+    .form-group input { width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 6px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+    .btn { padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+    .btn-sec { background: #eee; }
+    .btn-pri { background: #0f1419; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="profile-card">
+    <button class="config-btn" id="openModalBtn">⚙️</button>
+
+    <!-- Barra Superior -->
+    <div class="nav-bar">
+      <div class="nav-domain">🏠 <span id="siteDomain" contenteditable="true">soobie.com</span></div>
+    </div>
+
+    <!-- Banner y Avatar -->
+    <div class="banner-container">
+      <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800" class="banner-img" id="bannerImg">
+      <div class="avatar-container">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" class="avatar-img" id="avatarImg">
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="action-btn">Follow</button>
+    </div>
+
+    <!-- Detalles -->
+    <div class="profile-details">
+      <div class="profile-name-row">
+        <div class="profile-name" id="profName" contenteditable="true">(> . ☆) name</div>
+      </div>
+      <div class="profile-handle" id="profHandle" contenteditable="true">@soobcrds</div>
+      
+      <div class="profile-bio" id="profBio" contenteditable="true">
+        put your bio here 🌸 this design was made for Notion!
+      </div>
+
+      <div class="profile-meta">
+        <span class="meta-item">📍 <span id="metaLoc" contenteditable="true">pro/nouns • XXyo</span></span>
+        <span class="meta-item">📅 Joined <span id="metaDate" contenteditable="true">June 2020</span></span>
+        <span class="meta-item">🔗 <span id="metaLink" contenteditable="true">https://link.com/url</span></span>
+      </div>
+
+      <div class="profile-stats">
+        <span><span class="stat-val" id="statFollowers" contenteditable="true">2,9k</span> Followers</span>
+        <span><span class="stat-val" id="statFollowing" contenteditable="true">19</span> Following</span>
+      </div>
+    </div>
+
+    <!-- Publicación Fijada -->
+    <div class="pinned-post">
+      <div class="pinned-label">📌 Pinned</div>
+      <div class="post-header">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" class="post-avatar" id="postAvatarImg">
+        <div class="post-meta">
+          <span class="post-author" id="postAuthor">(> . ☆) name</span>
+          <span class="post-time" id="postHandleTime">@soobcrds · 19 hrs</span>
+        </div>
+      </div>
+      <div class="post-text" id="postText" contenteditable="true">
+        — to navigate this site, click the pfp to go to the home page :)
+      </div>
+      <div class="post-grid">
+        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500" class="grid-img" id="postImg1">
+        <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=500" class="grid-img" id="postImg2">
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Ajustes -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2>Ajustes de Imágenes</h2>
+      <div class="form-group">
+        <label>URL Imagen Banner:</label>
+        <input type="text" id="inBanner">
+      </div>
+      <div class="form-group">
+        <label>URL Foto Perfil:</label>
+        <input type="text" id="inAvatar">
+      </div>
+      <div class="form-group">
+        <label>URL Imagen Post 1:</label>
+        <input type="text" id="inImg1">
+      </div>
+      <div class="form-group">
+        <label>URL Imagen Post 2:</label>
+        <input type="text" id="inImg2">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-sec" id="closeModalBtn">Cancelar</button>
+        <button class="btn btn-pri" id="saveBtn">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Referencias
+    const bannerImg = document.getElementById('bannerImg');
+    const avatarImg = document.getElementById('avatarImg');
+    const postAvatarImg = document.getElementById('postAvatarImg');
+    const postImg1 = document.getElementById('postImg1');
+    const postImg2 = document.getElementById('postImg2');
+
+    const inBanner = document.getElementById('inBanner');
+    const inAvatar = document.getElementById('inAvatar');
+    const inImg1 = document.getElementById('inImg1');
+    const inImg2 = document.getElementById('inImg2');
+
+    const modalOverlay = document.getElementById('modalOverlay');
+
+    // Cargar datos guardados
+    bannerImg.src = localStorage.getItem('sc_banner') || bannerImg.src;
+    avatarImg.src = localStorage.getItem('sc_avatar') || avatarImg.src;
+    postAvatarImg.src = avatarImg.src;
+    postImg1.src = localStorage.getItem('sc_img1') || postImg1.src;
+    postImg2.src = localStorage.getItem('sc_img2') || postImg2.src;
+
+    // Modal
+    document.getElementById('openModalBtn').addEventListener('click', () => {
+      inBanner.value = bannerImg.src;
+      inAvatar.value = avatarImg.src;
+      inImg1.value = postImg1.src;
+      inImg2.value = postImg2.src;
+      modalOverlay.classList.add('active');
+    });
+
+    document.getElementById('closeModalBtn').addEventListener('click', () => modalOverlay.classList.remove('active'));
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      bannerImg.src = inBanner.value.trim() || bannerImg.src;
+      avatarImg.src = inAvatar.value.trim() || avatarImg.src;
+      postAvatarImg.src = avatarImg.src;
+      postImg1.src = inImg1.value.trim() || postImg1.src;
+      postImg2.src = inImg2.value.trim() || postImg2.src;
+
+      localStorage.setItem('sc_banner', bannerImg.src);
+      localStorage.setItem('sc_avatar', avatarImg.src);
+      localStorage.setItem('sc_img1', postImg1.src);
+      localStorage.setItem('sc_img2', postImg2.src);
+
+      modalOverlay.classList.remove('active');
+    });
+  </script>
+</body>
+</html>

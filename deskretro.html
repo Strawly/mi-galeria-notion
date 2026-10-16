@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget Escritorio Retro Windows 98 / 2000 Aesthetic - Notion</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=MS+Sans+Serif&family=Plus+Jakarta+Sans:wght@400;600;700&family=VT323&display=swap');
+
+        /* VARIABLES DE TEMA VINTAGE RETRO OS */
+        :root {
+            --theme-accent: #6aa3cd;
+            --theme-accent-hover: #558eb8;
+            --theme-header-bg: linear-gradient(90deg, #7baed0 0%, #a4cde8 100%);
+            --theme-header-text: #ffffff;
+            --theme-window-bg: #ece9d8;
+            --theme-toolbar-bg: #f0ede0;
+            --theme-footer-bg: #e2ded0;
+            --theme-dock-bg: rgba(236, 233, 216, 0.9);
+            --theme-border: #a09c8d;
+            --theme-border-light: #ffffff;
+            --theme-border-dark: #716f64;
+            --theme-text: #222222;
+            --theme-title: #ffffff;
+            --theme-editor-bg: #ffffff;
+            --theme-editor-text: #111111;
+            --theme-btn-bg: #ece9d8;
+            --theme-btn-text: #111111;
+            --theme-btn-hover-bg: #f5f3e7;
+            --theme-desktop-label: #ffffff;
+        }
+
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', Tahoma, sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            background-color: transparent;
+            color: var(--theme-text);
+            border-radius: 28px;
+        }
+
+        #main-widget-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            border-radius: 28px;
+            box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.4);
+        }
+
+        #wallpaper-bg {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 0.4s ease-in-out;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            border-radius: 28px;
+        }
+
+        /* ESTILO VINTAGE RETRO PARA VENTANAS (BISELADO 3D) */
+        .y2k-window {
+            background: var(--theme-window-bg);
+            border-top: 2px solid var(--theme-border-light);
+            border-left: 2px solid var(--theme-border-light);
+            border-right: 2px solid var(--theme-border-dark);
+            border-bottom: 2px solid var(--theme-border-dark);
+            box-shadow: 
+                4px 6px 16px rgba(0, 0, 0, 0.25),
+                inset 1px 1px 0px #ffffff,
+                inset -1px -1px 0px #808080;
+            border-radius: 4px;
+            overflow: hidden;
+            resize: both;
+            min-width: 320px;
+            min-height: 260px;
+            max-width: 95vw;
+            max-height: 90vh;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            color: var(--theme-text);
+        }
+
+        .y2k-header {
+            background: var(--theme-header-bg);
+            border-bottom: 1px solid var(--theme-border-dark);
+            flex-shrink: 0;
+            user-select: none;
+            color: var(--theme-header-text);
+            padding: 3px 6px;
+        }
+
+        .y2k-toolbar {
+            background: var(--theme-toolbar-bg);
+            border-bottom: 1px solid var(--theme-border);
+            border-top: 1px solid #ffffff;
+            flex-shrink: 0;
+            user-select: none;
+            padding: 4px 6px;
+        }
+
+        .y2k-footer {
+            background: var(--theme-footer-bg);
+            border-top: 1px solid var(--theme-border-light);
+            flex-shrink: 0;
+            user-select: none;
+            color: var(--theme-text);
+        }
+
+        /* BOTONES BISELADOS 3D RETRO OS */
+        .retro-btn {
+            background: var(--theme-btn-bg);
+            border-top: 1.5px solid var(--theme-border-light);
+            border-left: 1.5px solid var(--theme-border-light);
+            border-right: 1.5px solid var(--theme-border-dark);
+            border-bottom: 1.5px solid var(--theme-border-dark);
+            color: var(--theme-btn-text);
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 0px #ffffff;
+        }
+
+        .retro-btn:active, .retro-btn.active {
+            border-top: 1.5px solid var(--theme-border-dark);
+            border-left: 1.5px solid var(--theme-border-dark);
+            border-right: 1.5px solid var(--theme-border-light);
+            border-bottom: 1.5px solid var(--theme-border-light);
+            background: #dcd8c8;
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .retro-btn:hover {
+            background: var(--theme-btn-hover-bg);
+        }
+
+        /* BOTONES DE CONTROL DE LA CABECERA (O, -, X) */
+        .retro-win-control {
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: monospace;
+            background: #ece9d8;
+            border-top: 1.5px solid #ffffff;
+            border-left: 1.5px solid #ffffff;
+            border-right: 1.5px solid #716f64;
+            border-bottom: 1.5px solid #716f64;
+            color: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .retro-win-control:active {
+            border-top: 1.5px solid #716f64;
+            border-left: 1.5px solid #716f64;
+            border-right: 1.5px solid #ffffff;
+            border-bottom: 1.5px solid #ffffff;
+            background: #dcd8c8;
+        }
+
+        /* DOCK RETRO EN BASE AL SUTIL GLASS RETRO */
+        .liquid-glass-dock {
+            background: var(--theme-dock-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 2px solid var(--theme-border-light);
+            border-left: 2px solid var(--theme-border-light);
+            border-right: 2px solid var(--theme-border-dark);
+            border-bottom: 2px solid var(--theme-border-dark);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .dock-btn {
+            position: relative;
+            background: var(--theme-btn-bg);
+            border-top: 1.5px solid var(--theme-border-light);
+            border-left: 1.5px solid var(--theme-border-light);
+            border-right: 1.5px solid var(--theme-border-dark);
+            border-bottom: 1.5px solid var(--theme-border-dark);
+            color: var(--theme-btn-text);
+            border-radius: 4px;
+            transition: transform 0.15s ease;
+        }
+
+        .dock-btn:hover {
+            transform: translateY(-2px);
+            background: var(--theme-btn-hover-bg);
+        }
+
+        .dock-btn.active-win {
+            border-top: 1.5px solid var(--theme-border-dark);
+            border-left: 1.5px solid var(--theme-border-dark);
+            border-right: 1.5px solid var(--theme-border-light);
+            border-bottom: 1.5px solid var(--theme-border-light);
+            background: #d0c8b8;
+        }
+
+        .dock-dot {
+            width: 4px;
+            height: 4px;
+            background-color: var(--theme-accent);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .dock-btn .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            pointer-events: none;
+            background: #ece9d8;
+            border: 1px solid #716f64;
+            border-radius: 3px;
+            color: #000;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .dock-btn:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ÍCONOS DE ESCRITORIO CON ETIQUETA VINTAGE */
+        .desktop-item {
+            position: absolute;
+            transition: left 0.2s ease, top 0.2s ease;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            cursor: grab;
+            outline: none;
+            z-index: 10;
+        }
+
+        .desktop-item:active {
+            cursor: grabbing;
+        }
+
+        .desktop-item.dragging {
+            transition: none !important;
+            z-index: 1000 !important;
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .desktop-item:hover .icon-wrapper {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .icon-wrapper {
+            transition: transform 0.15s ease, filter 0.15s ease;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+        }
+
+        .desktop-label {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--theme-desktop-label);
+            text-shadow: 
+                0 1px 2px rgba(0, 0, 0, 0.9),
+                0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* EDITOR DE NOTAS CON FORMATO Y2K VINTAGE */
+        .rich-note-editor {
+            user-select: text;
+            -webkit-user-select: text;
+            outline: none;
+            min-height: 100%;
+            background: var(--theme-editor-bg);
+            color: var(--theme-editor-text);
+            line-height: 1.5;
+            border-top: 2px solid var(--theme-border-dark);
+            border-left: 2px solid var(--theme-border-dark);
+            border-right: 1.5px solid var(--theme-border-light);
+            border-bottom: 1.5px solid var(--theme-border-light);
+        }
+
+        .rich-note-editor:empty:before {
+            content: attr(data-placeholder);
+            color: #888888;
+            pointer-events: none;
+            display: block;
+        }
+
+        .rich-note-editor ul {
+            list-style-type: disc;
+            padding-left: 1.25rem;
+            margin-top: 0.4rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .rich-note-editor ol {
+            list-style-type: decimal;
+            padding-left: 1.25rem;
+            margin-top: 0.4rem;
+            margin-bottom: 0.4rem;
+        }
+
+        /* IMÁGENES INLINE CON TEXTO FLOTANTE */
+        .rich-note-editor .inline-img-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 6px;
+            vertical-align: middle;
+            user-select: none;
+            max-width: 100%;
+        }
+
+        .rich-note-editor .inline-img-wrapper img {
+            border: 2px solid var(--theme-border-dark);
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.15s ease;
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .rich-note-editor .inline-img-wrapper:hover img {
+            border-color: var(--theme-accent);
+        }
+
+        .img-toolbar {
+            position: absolute;
+            top: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ece9d8;
+            border: 1px solid #716f64;
+            padding: 2px 4px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+        }
+
+        .inline-img-wrapper:hover .img-toolbar {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .img-toolbar button {
+            background: #ece9d8;
+            border-top: 1px solid #fff;
+            border-left: 1px solid #fff;
+            border-right: 1px solid #716f64;
+            border-bottom: 1px solid #716f64;
+            padding: 1px 4px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .inline-img-wrapper.align-left {
+            float: left;
+            margin: 4px 12px 4px 0;
+        }
+
+        .inline-img-wrapper.align-center {
+            display: block;
+            margin: 8px auto;
+            text-align: center;
+            float: none;
+        }
+
+        .inline-img-wrapper.align-right {
+            float: right;
+            margin: 4px 0 4px 12px;
+        }
+
+        .inline-img-wrapper.align-full {
+            display: block;
+            width: 100%;
+            margin: 8px 0;
+            float: none;
+        }
+
+        .inline-img-wrapper.align-full img {
+            width: 100% !important;
+        }
+
+        .rich-note-editor::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #ece9d8;
+            border: 1px solid #a09c8d;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #c0bcb0;
+            border-top: 1.5px solid #ffffff;
+            border-left: 1.5px solid #ffffff;
+            border-right: 1.5px solid #716f64;
+            border-bottom: 1.5px solid #716f64;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden relative">
+
+    <div id="main-widget-container" class="relative w-full h-full overflow-hidden rounded-[28px]">
+
+        <!-- FONDO DE PANTALLA -->
+        <div id="wallpaper-bg" class="rounded-[28px]"></div>
+
+        <!-- OVERLAY ARRASTRAR ARCHIVO DE FONDO -->
+        <div id="drop-overlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md text-white pointer-events-none transition-all rounded-[28px]">
+            <i data-lucide="image-plus" class="w-16 h-16 mb-3 animate-bounce text-sky-200"></i>
+            <p class="text-base font-bold tracking-wide">Suelta aquí tu nueva imagen de fondo 🌊</p>
+            <p class="text-xs text-sky-100/80 mt-1">Soporta JPG, PNG, WEBP y GIF</p>
+        </div>
+
+        <!-- ÁREA DEL ESCRITORIO (ÍCONOS) -->
+        <main id="desktop-area" class="w-full h-full pb-28 relative overflow-hidden z-10"></main>
+
+        <!-- CONTENEDOR MULTI-VENTANAS PARALELAS -->
+        <div id="windows-container" class="fixed inset-0 z-30 pointer-events-none rounded-[28px]"></div>
+
+        <!-- DOCK INFERIOR (BARRA DE TAREAS RETRO) -->
+        <nav class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40">
+            <div class="liquid-glass-dock px-3 py-2 flex items-center gap-2 max-w-[95vw] overflow-x-auto no-scrollbar">
+                
+                <button onclick="openNewModal()" class="dock-btn p-2 shrink-0" title="Añadir Nota">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span class="tooltip px-2 py-0.5 text-[10px] font-medium">Añadir Nota / Ícono</span>
+                </button>
+
+                <button onclick="toggleThemeMenu()" class="dock-btn p-2 shrink-0" title="Cambiar Fondo">
+                    <i data-lucide="image" class="w-4 h-4"></i>
+                    <span class="tooltip px-2 py-0.5 text-[10px] font-medium">Cambiar Fondo</span>
+                </button>
+
+                <button onclick="toggleColorSettingsModal()" class="dock-btn p-2 shrink-0" title="Paleta de Colores">
+                    <i data-lucide="palette" class="w-4 h-4"></i>
+                    <span class="tooltip px-2 py-0.5 text-[10px] font-medium">Personalizar Tema</span>
+                </button>
+
+                <div class="h-5 w-[2px] border-l border-white border-r border-[#716f64] my-auto mx-0.5 shrink-0"></div>
+
+                <div id="dock-dynamic-apps" class="flex items-center gap-1.5 shrink-0"></div>
+
+                <div class="h-5 w-[2px] border-l border-white border-r border-[#716f64] my-auto mx-0.5 shrink-0"></div>
+
+                <button onclick="shuffleItems()" class="dock-btn p-2 shrink-0" title="Mezclar Íconos">
+                    <i data-lucide="shuffle" class="w-4 h-4"></i>
+                    <span class="tooltip px-2 py-0.5 text-[10px] font-medium">Aleatorizar Íconos</span>
+                </button>
+
+                <button onclick="resetDesktop()" class="dock-btn p-2 !text-rose-600 shrink-0" title="Restablecer Todo">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    <span class="tooltip px-2 py-0.5 text-[10px] font-medium">Restablecer Todo</span>
+                </button>
+
+            </div>
+        </nav>
+
+    </div>
+
+    <!-- MENU CAMBIO DE FONDO DE PANTALLA -->
+    <div id="wallpaper-menu" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 y2k-window p-4 w-80 sm:w-96 shadow-2xl space-y-3 hidden">
+        <div class="flex justify-between items-center pb-1 border-b border-[#a09c8d]">
+            <h3 class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Fondo de Pantalla Retro
+            </h3>
+            <button onclick="toggleThemeMenu()" class="retro-win-control">✕</button>
+        </div>
+
+        <div class="space-y-1">
+            <label class="block text-[11px] font-medium">Pegar URL de Imagen</label>
+            <div class="flex gap-1.5">
+                <input type="url" id="wallpaper-url-input" placeholder="https://ejemplo.com/fondo.jpg" class="flex-1 bg-white border-2 border-t-[#716f64] border-l-[#716f64] border-r-white border-b-white px-2 py-1 text-xs focus:outline-none">
+                <button onclick="setWallpaperFromInput()" class="retro-btn px-3 py-1">Aplicar</button>
+            </div>
+        </div>
+
+        <div class="space-y-1">
+            <label class="block text-[11px] font-medium">Subir Imagen Local</label>
+            <label class="flex items-center justify-center gap-1.5 w-full p-2 bg-[#f0ede0] border-2 border-t-white border-l-white border-r-[#716f64] border-b-[#716f64] cursor-pointer text-xs font-medium">
+                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                <span>Seleccionar desde el equipo</span>
+                <input type="file" id="wallpaper-file-input" accept="image/*" class="hidden" onchange="handleWallpaperUpload(event)">
+            </label>
+        </div>
+
+        <div class="space-y-1">
+            <label class="block text-[11px] font-medium">Presets Vintage OS</label>
+            <div class="grid grid-cols-2 gap-1.5">
+                <button onclick="setWallpaper('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200')" class="h-10 border border-[#716f64] bg-cover bg-center flex items-end p-1 text-[9px] font-bold text-slate-800" style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=300')"><span class="bg-white/80 px-1">Playa Soft</span></button>
+                <button onclick="setWallpaper('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1200')" class="h-10 border border-[#716f64] bg-cover bg-center flex items-end p-1 text-[9px] font-bold text-slate-800" style="background-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=300')"><span class="bg-white/80 px-1">Pastel OS</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PALETAS DE COLOR -->
+    <div id="color-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
+        <div class="y2k-window w-full max-w-sm p-4 space-y-3">
+            <div class="flex justify-between items-center border-b border-[#a09c8d] pb-1">
+                <h3 class="font-bold text-xs flex items-center gap-1.5">
+                    <i data-lucide="palette" class="w-3.5 h-3.5"></i> Estilos Cromáticos Retro
+                </h3>
+                <button onclick="toggleColorSettingsModal()" class="retro-win-control">✕</button>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-[11px] font-medium">Selecciona un tema:</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="applyPresetTheme('cyan')" class="retro-btn py-2 px-2.5 flex items-center gap-2 justify-start">
+                        <span class="w-3.5 h-3.5 rounded-xs bg-[#7baed0] border border-black shrink-0"></span>
+                        <span class="text-xs">🌊 Win2K Sea Blue</span>
+                    </button>
+                    <button onclick="applyPresetTheme('pink')" class="retro-btn py-2 px-2.5 flex items-center gap-2 justify-start">
+                        <span class="w-3.5 h-3.5 rounded-xs bg-[#f472b6] border border-black shrink-0"></span>
+                        <span class="text-xs">🌸 Soft Pink</span>
+                    </button>
+                    <button onclick="applyPresetTheme('lavender')" class="retro-btn py-2 px-2.5 flex items-center gap-2 justify-start">
+                        <span class="w-3.5 h-3.5 rounded-xs bg-[#c084fc] border border-black shrink-0"></span>
+                        <span class="text-xs">🍇 Lavender OS</span>
+                    </button>
+                    <button onclick="applyPresetTheme('matcha')" class="retro-btn py-2 px-2.5 flex items-center gap-2 justify-start">
+                        <span class="w-3.5 h-3.5 rounded-xs bg-[#34d399] border border-black shrink-0"></span>
+                        <span class="text-xs">🍵 Vintage Sage</span>
+                    </button>
+                    <button onclick="applyPresetTheme('white')" class="retro-btn py-2 px-2.5 flex items-center gap-2 justify-start">
+                        <span class="w-3.5 h-3.5 rounded-xs bg-white border border-black shrink-0"></span>
+                        <span class="text-xs">🤍 Blanco y Negro</span>
+                    </button>
+                    <button onclick="applyPresetTheme('dark')" class="retro-btn py-2 px-2.5 flex items-center gap-2 justify-start">
+                        <span class="w-3.5 h-3.5 rounded-xs bg-black border border-white shrink-0"></span>
+                        <span class="text-xs">🖤 Negro y Blanco</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end gap-1.5 border-t border-[#a09c8d]">
+                <button type="button" onclick="applyPresetTheme('cyan')" class="retro-btn px-3 py-1">Restablecer</button>
+                <button type="button" onclick="toggleColorSettingsModal()" class="retro-btn px-4 py-1 active">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CREAR NUEVO ÍCONO -->
+    <div id="new-item-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
+        <div class="y2k-window w-full max-w-sm p-4 space-y-3">
+            <div class="flex justify-between items-center border-b border-[#a09c8d] pb-1">
+                <h3 class="font-bold text-xs flex items-center gap-1.5">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Crear Nuevo Ícono Retro
+                </h3>
+                <button onclick="closeNewModal()" class="retro-win-control">✕</button>
+            </div>
+
+            <form id="new-item-form" onsubmit="handleCreateItem(event)" class="space-y-2.5">
+                <div>
+                    <label class="block text-[11px] font-medium mb-1">Título del Ícono</label>
+                    <input type="text" id="item-title" required placeholder="Ej: Mi Nota..." class="w-full bg-white border-2 border-t-[#716f64] border-l-[#716f64] border-r-white border-b-white p-1.5 text-xs focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium mb-1">Ícono (Emoji o URL de Imagen)</label>
+                    <input type="text" id="item-icon" placeholder="📁 o https://..." class="w-full bg-white border-2 border-t-[#716f64] border-l-[#716f64] border-r-white border-b-white p-1.5 text-xs focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium mb-1">Nota Inicial</label>
+                    <textarea id="item-note-body" rows="3" placeholder="Escribe aquí..." class="w-full bg-white border-2 border-t-[#716f64] border-l-[#716f64] border-r-white border-b-white p-1.5 text-xs focus:outline-none custom-scroll"></textarea>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-1.5 border-t border-[#a09c8d]">
+                    <button type="button" onclick="closeNewModal()" class="retro-btn px-3 py-1">Cancelar</button>
+                    <button type="submit" class="retro-btn px-4 py-1 active">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL INSERTAR URL DE IMAGEN EN NOTAS -->
+    <div id="image-url-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
+        <div class="y2k-window w-full max-w-sm p-4 space-y-3">
+            <div class="flex justify-between items-center border-b border-[#a09c8d] pb-1">
+                <h3 class="font-bold text-xs flex items-center gap-1.5">
+                    <i data-lucide="link" class="w-3.5 h-3.5"></i> Insertar Enlace de Imagen
+                </h3>
+                <button onclick="closeImageUrlModal()" class="retro-win-control">✕</button>
+            </div>
+
+            <form id="image-url-form" onsubmit="handleConfirmImageUrl(event)" class="space-y-2.5">
+                <div>
+                    <label class="block text-[11px] font-medium mb-1">URL de la Imagen</label>
+                    <input type="url" id="image-url-input-field" required placeholder="https://ejemplo.com/imagen.jpg" class="w-full bg-white border-2 border-t-[#716f64] border-l-[#716f64] border-r-white border-b-white p-1.5 text-xs focus:outline-none">
+                </div>
+
+                <div class="pt-2 flex justify-end gap-1.5 border-t border-[#a09c8d]">
+                    <button type="button" onclick="closeImageUrlModal()" class="retro-btn px-3 py-1">Cancelar</button>
+                    <button type="submit" class="retro-btn px-4 py-1 active">Insertar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const defaultWallpaper = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200';
+
+        const defaultItems = [
+            {
+                id: '1',
+                title: 'My Computer',
+                icon: '💻',
+                content: '<b>Bienvenidx a tu escritorio Retro OS para Notion! 🌊</b><br><br>• Haz doble clic en los íconos para abrir aplicaciones.<br>• Mueve y redimensiona las ventanas como en un sistema operativo real.<br>• Inserta imágenes en tus notas directamente o mediante enlaces.<br>• Cambia fondos y paletas desde la barra inferior.',
+                x: 60,
+                y: 60
+            },
+            {
+                id: '2',
+                title: 'Gallery',
+                icon: '📂',
+                content: '<b>Fotos & Moodboard Retro</b><br>Tus imágenes guardadas aparecerán aquí ✨',
+                x: 60,
+                y: 180
+            },
+            {
+                id: '3',
+                title: 'Important',
+                icon: '⚠️',
+                content: '<b>Lista de Recordatorios:</b><br>1. Revisar tareas de la semana ✔️<br>2. Diseñar en Notion 🎨<br>3. Disfrutar del día ☀️',
+                x: 170,
+                y: 60
+            },
+            {
+                id: '4',
+                title: 'Notes.txt',
+                icon: '📝',
+                content: 'Notas rápidas y apuntes cotidianos...',
+                x: 170,
+                y: 180
+            }
+        ];
+
+        const presetThemes = {
+            cyan: {
+                accent: '#6aa3cd',
+                accentHover: '#558eb8',
+                border: '#a09c8d',
+                header: 'linear-gradient(90deg, #7baed0 0%, #a4cde8 100%)',
+                headerText: '#ffffff',
+                windowBg: '#ece9d8',
+                toolbarBg: '#f0ede0',
+                footerBg: '#e2ded0',
+                dockBg: 'rgba(236, 233, 216, 0.95)',
+                text: '#222222',
+                editorBg: '#ffffff',
+                editorText: '#111111',
+                btnBg: '#ece9d8',
+                btnText: '#111111',
+                btnHoverBg: '#f5f3e7',
+                desktopLabel: '#ffffff'
+            },
+            pink: {
+                accent: '#f472b6',
+                accentHover: '#ec4899',
+                border: '#d0b8c0',
+                header: 'linear-gradient(90deg, #fce0e6 0%, #f7c2d0 100%)',
+                headerText: '#4a2b35',
+                windowBg: '#fcf8f9',
+                toolbarBg: '#f9f0f3',
+                footerBg: '#f2e6ea',
+                dockBg: 'rgba(252, 248, 249, 0.95)',
+                text: '#4a3b51',
+                editorBg: '#ffffff',
+                editorText: '#22111a',
+                btnBg: '#fcf8f9',
+                btnText: '#4a3b51',
+                btnHoverBg: '#ffffff',
+                desktopLabel: '#ffffff'
+            },
+            lavender: {
+                accent: '#c084fc',
+                accentHover: '#a855f7',
+                border: '#b8a0d0',
+                header: 'linear-gradient(90deg, #e9d5ff 0%, #c8a2f8 100%)',
+                headerText: '#2d1b40',
+                windowBg: '#f8f5fc',
+                toolbarBg: '#f2eaf9',
+                footerBg: '#e8dbf2',
+                dockBg: 'rgba(248, 245, 252, 0.95)',
+                text: '#3a2b4a',
+                editorBg: '#ffffff',
+                editorText: '#1a0b2a',
+                btnBg: '#f8f5fc',
+                btnText: '#3a2b4a',
+                btnHoverBg: '#ffffff',
+                desktopLabel: '#ffffff'
+            },
+            matcha: {
+                accent: '#34d399',
+                accentHover: '#10b981',
+                border: '#a0c0b0',
+                header: 'linear-gradient(90deg, #d1e7dd 0%, #a3d9c2 100%)',
+                headerText: '#1b3b2b',
+                windowBg: '#f4f9f6',
+                toolbarBg: '#e9f3ed',
+                footerBg: '#dbece3',
+                dockBg: 'rgba(244, 249, 246, 0.95)',
+                text: '#2b3b33',
+                editorBg: '#ffffff',
+                editorText: '#0b1b13',
+                btnBg: '#f4f9f6',
+                btnText: '#2b3b33',
+                btnHoverBg: '#ffffff',
+                desktopLabel: '#ffffff'
+            },
+            white: {
+                accent: '#000000',
+                accentHover: '#333333',
+                border: '#888888',
+                header: 'linear-gradient(90deg, #e0e0e0 0%, #ffffff 100%)',
+                headerText: '#000000',
+                windowBg: '#ffffff',
+                toolbarBg: '#f5f5f5',
+                footerBg: '#eeeeee',
+                dockBg: 'rgba(255, 255, 255, 0.95)',
+                text: '#000000',
+                editorBg: '#ffffff',
+                editorText: '#000000',
+                btnBg: '#ffffff',
+                btnText: '#000000',
+                btnHoverBg: '#f0f0f0',
+                desktopLabel: '#ffffff'
+            },
+            dark: {
+                accent: '#ffffff',
+                accentHover: '#cccccc',
+                border: '#444444',
+                header: 'linear-gradient(90deg, #111111 0%, #222222 100%)',
+                headerText: '#ffffff',
+                windowBg: '#181818',
+                toolbarBg: '#222222',
+                footerBg: '#111111',
+                dockBg: 'rgba(24, 24, 24, 0.95)',
+                text: '#ffffff',
+                editorBg: '#111111',
+                editorText: '#ffffff',
+                btnBg: '#2a2a2a',
+                btnText: '#ffffff',
+                btnHoverBg: '#383838',
+                desktopLabel: '#ffffff'
+            }
+        };
+
+        let desktopItems = [];
+        let currentWallpaper = defaultWallpaper;
+        let openWindows = {}; 
+        let globalZIndex = 30;
+
+        let activeEditorForUrl = null;
+        let savedRangeForUrl = null;
+
+        window.onload = function () {
+            loadSavedState();
+            renderDesktop();
+            setupDragAndDropWallpaper();
+            lucide.createIcons();
+        };
+
+        function loadSavedState() {
+            try {
+                const savedItems = localStorage.getItem('y2k_notion_items');
+                const savedBg = localStorage.getItem('y2k_notion_bg');
+                const savedThemeKey = localStorage.getItem('y2k_notion_theme_key');
+
+                if (savedItems) {
+                    desktopItems = JSON.parse(savedItems);
+                } else {
+                    desktopItems = JSON.parse(JSON.stringify(defaultItems));
+                }
+
+                if (savedBg) {
+                    currentWallpaper = savedBg;
+                } else {
+                    currentWallpaper = defaultWallpaper;
+                }
+
+                if (savedThemeKey && presetThemes[savedThemeKey]) {
+                    applyPresetTheme(savedThemeKey);
+                } else {
+                    applyPresetTheme('cyan');
+                }
+
+                applyWallpaperStyle(currentWallpaper);
+
+                desktopItems.forEach((item, index) => {
+                    if (item.x === undefined || item.y === undefined) {
+                        const pos = getRandomPosition(index);
+                        item.x = pos.x;
+                        item.y = pos.y;
+                    }
+                });
+            } catch (e) {
+                console.warn('Error al cargar LocalStorage:', e);
+                desktopItems = JSON.parse(JSON.stringify(defaultItems));
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('y2k_notion_items', JSON.stringify(desktopItems));
+                localStorage.setItem('y2k_notion_bg', currentWallpaper);
+            } catch (e) {
+                console.warn('Error al guardar en LocalStorage');
+            }
+        }
+
+        function applyPresetTheme(key) {
+            const theme = presetThemes[key] || presetThemes.cyan;
+
+            document.documentElement.style.setProperty('--theme-accent', theme.accent);
+            document.documentElement.style.setProperty('--theme-accent-hover', theme.accentHover);
+            document.documentElement.style.setProperty('--theme-border', theme.border);
+            document.documentElement.style.setProperty('--theme-header-bg', theme.header);
+            document.documentElement.style.setProperty('--theme-header-text', theme.headerText);
+            document.documentElement.style.setProperty('--theme-window-bg', theme.windowBg);
+            document.documentElement.style.setProperty('--theme-toolbar-bg', theme.toolbarBg);
+            document.documentElement.style.setProperty('--theme-footer-bg', theme.footerBg);
+            document.documentElement.style.setProperty('--theme-dock-bg', theme.dockBg);
+            document.documentElement.style.setProperty('--theme-text', theme.text);
+            document.documentElement.style.setProperty('--theme-editor-bg', theme.editorBg);
+            document.documentElement.style.setProperty('--theme-editor-text', theme.editorText);
+            document.documentElement.style.setProperty('--theme-btn-bg', theme.btnBg);
+            document.documentElement.style.setProperty('--theme-btn-text', theme.btnText);
+            document.documentElement.style.setProperty('--theme-btn-hover-bg', theme.btnHoverBg);
+            document.documentElement.style.setProperty('--theme-desktop-label', theme.desktopLabel);
+
+            localStorage.setItem('y2k_notion_theme_key', key);
+        }
+
+        function toggleColorSettingsModal() {
+            document.getElementById('color-settings-modal').classList.toggle('hidden');
+        }
+
+        function applyWallpaperStyle(url) {
+            const bgContainer = document.getElementById('wallpaper-bg');
+            bgContainer.style.backgroundImage = `url('${url}')`;
+            currentWallpaper = url;
+        }
+
+        function setWallpaper(url) {
+            applyWallpaperStyle(url);
+            saveState();
+        }
+
+        function setWallpaperFromInput() {
+            const input = document.getElementById('wallpaper-url-input');
+            if (input && input.value.trim() !== '') {
+                setWallpaper(input.value.trim());
+                input.value = '';
+            }
+        }
+
+        function handleWallpaperUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    setWallpaper(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function toggleThemeMenu() {
+            document.getElementById('wallpaper-menu').classList.toggle('hidden');
+        }
+
+        function setupDragAndDropWallpaper() {
+            const body = document.body;
+            const overlay = document.getElementById('drop-overlay');
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                body.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    overlay.classList.remove('hidden');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                body.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    overlay.classList.add('hidden');
+                }, false);
+            });
+
+            body.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files && files.length > 0 && files[0].type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (re) => setWallpaper(re.target.result);
+                    reader.readAsDataURL(files[0]);
+                }
+            }, false);
+        }
+
+        function getRandomPosition(index) {
+            const paddingX = 40;
+            const paddingTop = 40;
+            const paddingBottom = 120;
+            
+            const availWidth = Math.max(280, window.innerWidth - 100);
+            const availHeight = Math.max(280, window.innerHeight - paddingTop - paddingBottom);
+
+            const x = paddingX + Math.random() * (availWidth - paddingX);
+            const y = paddingTop + Math.random() * availHeight;
+
+            return { x: Math.round(x), y: Math.round(y) };
+        }
+
+        function shuffleItems() {
+            desktopItems.forEach((item, idx) => {
+                const pos = getRandomPosition(idx);
+                item.x = pos.x;
+                item.y = pos.y;
+            });
+            saveState();
+            renderDesktop();
+        }
+
+        function renderDesktop() {
+            const area = document.getElementById('desktop-area');
+            area.innerHTML = '';
+
+            desktopItems.forEach((item) => {
+                const el = document.createElement('div');
+                el.className = 'desktop-item flex flex-col items-center justify-center p-1.5 w-20 sm:w-24 select-none';
+                el.style.left = `${item.x}px`;
+                el.style.top = `${item.y}px`;
+
+                let iconHtml = '';
+                if (item.icon.startsWith('http') || item.icon.startsWith('data:image')) {
+                    iconHtml = `<img src="${item.icon}" alt="${item.title}" class="w-9 h-9 sm:w-11 sm:h-11 object-contain pointer-events-none">`;
+                } else {
+                    iconHtml = `<span class="text-3xl sm:text-4xl pointer-events-none">${item.icon}</span>`;
+                }
+
+                el.innerHTML = `
+                    <div class="icon-wrapper flex items-center justify-center mb-1">
+                        ${iconHtml}
+                    </div>
+                    <span class="desktop-label text-center line-clamp-2 w-full">${item.title}</span>
+                `;
+
+                makeDraggable(el, item);
+
+                el.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    openWindow(item);
+                });
+
+                let lastTap = 0;
+                el.addEventListener('touchend', (e) => {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTap;
+                    if (tapLength < 350 && tapLength > 0) {
+                        openWindow(item);
+                        e.preventDefault();
+                    }
+                    lastTap = currentTime;
+                });
+
+                area.appendChild(el);
+            });
+        }
+
+        function makeDraggable(element, item) {
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
+
+            function onStart(e) {
+                isDragging = true;
+                element.classList.add('dragging');
+
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                startX = clientX;
+                startY = clientY;
+                initialX = item.x;
+                initialY = item.y;
+
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onEnd);
+                document.addEventListener('touchmove', onMove, { passive: false });
+                document.addEventListener('touchend', onEnd);
+            }
+
+            function onMove(e) {
+                if (!isDragging) return;
+
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+
+                let newX = initialX + dx;
+                let newY = initialY + dy;
+
+                newX = Math.max(5, Math.min(window.innerWidth - 85, newX));
+                newY = Math.max(5, Math.min(window.innerHeight - 110, newY));
+
+                item.x = newX;
+                item.y = newY;
+
+                element.style.left = `${newX}px`;
+                element.style.top = `${newY}px`;
+            }
+
+            function onEnd() {
+                if (!isDragging) return;
+                isDragging = false;
+                element.classList.remove('dragging');
+
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onEnd);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend', onEnd);
+
+                saveState();
+            }
+
+            element.addEventListener('mousedown', onStart);
+            element.addEventListener('touchstart', onStart, { passive: true });
+        }
+
+        function openWindow(item) {
+            const container = document.getElementById('windows-container');
+            let winEl = document.getElementById(`win-${item.id}`);
+
+            globalZIndex += 2;
+
+            if (winEl) {
+                winEl.style.display = 'flex';
+                winEl.style.zIndex = globalZIndex;
+                winEl.style.transform = 'scale(1)';
+                winEl.style.opacity = '1';
+                openWindows[item.id] = { minified: false, zIndex: globalZIndex };
+                updateDynamicDock();
+                return;
+            }
+
+            winEl = document.createElement('div');
+            winEl.id = `win-${item.id}`;
+            winEl.className = 'y2k-window w-full max-w-lg shadow-2xl absolute pointer-events-auto';
+            winEl.style.zIndex = globalZIndex;
+
+            const offset = (Object.keys(openWindows).length % 5) * 18;
+            const leftPos = Math.max(10, Math.min(window.innerWidth - 480, (window.innerWidth / 2 - 250) + offset));
+            const topPos = Math.max(20, Math.min(window.innerHeight - 420, 35 + offset));
+
+            winEl.style.left = `${leftPos}px`;
+            winEl.style.top = `${topPos}px`;
+
+            let iconHtml = item.icon.startsWith('http') || item.icon.startsWith('data:image') 
+                ? `<img src="${item.icon}" class="w-3.5 h-3.5 object-contain">`
+                : item.icon;
+
+            winEl.innerHTML = `
+                <div class="y2k-header flex items-center justify-between cursor-move" onmousedown="bringToFront('${item.id}')">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs">${iconHtml}</span>
+                        <input type="text" class="bg-transparent font-semibold text-xs focus:outline-none focus:bg-black/10 px-1 py-0.5 border border-transparent" value="${item.title}" onchange="updateItemTitle('${item.id}', this.value)">
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <button onclick="minimizeWindow('${item.id}')" class="retro-win-control" title="Minimizar">_</button>
+                        <button onclick="toggleHeartLike(this)" class="retro-win-control" title="Favorito">O</button>
+                        <button onclick="closeWindow('${item.id}')" class="retro-win-control" title="Cerrar">X</button>
+                    </div>
+                </div>
+
+                <div class="y2k-toolbar flex items-center justify-between gap-1 overflow-x-auto custom-scroll">
+                    <div class="flex items-center gap-1">
+                        <button class="retro-btn">←</button>
+                        <button class="retro-btn">→</button>
+                        <button class="retro-btn">⌂</button>
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <button onclick="execCmdInWin('${item.id}', 'bold')" class="retro-btn"><b>B</b></button>
+                        <button onclick="execCmdInWin('${item.id}', 'italic')" class="retro-btn"><i>I</i></button>
+                        <button onclick="execCmdInWin('${item.id}', 'insertUnorderedList')" class="retro-btn"><i data-lucide="list" class="w-3 h-3"></i></button>
+                        <button onclick="promptInsertImageURL('${item.id}')" class="retro-btn">
+                            <i data-lucide="link" class="w-3 h-3 mr-1"></i> URL Img
+                        </button>
+                        <label class="retro-btn active cursor-pointer">
+                            <i data-lucide="image-plus" class="w-3 h-3 mr-1"></i> Subir
+                            <input type="file" accept="image/*" class="hidden" onchange="handleImageUploadInline('${item.id}', event)">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="p-2 overflow-y-auto custom-scroll flex-1" onclick="bringToFront('${item.id}')">
+                    <div id="editor-${item.id}" contenteditable="true" data-placeholder="Escribe tu nota aquí..." class="rich-note-editor p-3 text-xs sm:text-sm shadow-inner focus:outline-none leading-relaxed min-h-[160px]" oninput="saveNoteContent('${item.id}')">${item.content || ''}</div>
+                </div>
+
+                <div class="y2k-footer px-3 py-1 flex justify-between items-center text-[10px] font-medium">
+                    <span class="opacity-70">Guardado automáticamente</span>
+                    <button onclick="deleteDesktopItem('${item.id}')" class="retro-btn !text-rose-600">Eliminar Nota</button>
+                </div>
+            `;
+
+            container.appendChild(winEl);
+            makeWindowDraggable(winEl, item.id);
+
+            openWindows[item.id] = { minified: false, zIndex: globalZIndex };
+            updateDynamicDock();
+            lucide.createIcons();
+        }
+
+        function execCmdInWin(winId, command, value = null) {
+            const editor = document.getElementById(`editor-${winId}`);
+            if (editor) {
+                editor.focus();
+                document.execCommand(command, false, value);
+                saveNoteContent(winId);
+            }
+        }
+
+        function bringToFront(id) {
+            const winEl = document.getElementById(`win-${id}`);
+            if (winEl) {
+                globalZIndex += 1;
+                winEl.style.zIndex = globalZIndex;
+                if (openWindows[id]) {
+                    openWindows[id].zIndex = globalZIndex;
+                }
+            }
+        }
+
+        function minimizeWindow(id) {
+            const winEl = document.getElementById(`win-${id}`);
+            if (winEl) {
+                winEl.style.transform = 'scale(0.8)';
+                winEl.style.opacity = '0';
+                setTimeout(() => {
+                    winEl.style.display = 'none';
+                    if (openWindows[id]) openWindows[id].minified = true;
+                    updateDynamicDock();
+                }, 150);
+            }
+        }
+
+        function closeWindow(id) {
+            const winEl = document.getElementById(`win-${id}`);
+            if (winEl) {
+                winEl.remove();
+                delete openWindows[id];
+                updateDynamicDock();
+            }
+        }
+
+        function toggleDockApp(id) {
+            const winState = openWindows[id];
+            const item = desktopItems.find(i => i.id === id);
+
+            if (!winState) {
+                if (item) openWindow(item);
+            } else if (winState.minified) {
+                openWindow(item);
+            } else {
+                minimizeWindow(id);
+            }
+        }
+
+        function updateDynamicDock() {
+            const container = document.getElementById('dock-dynamic-apps');
+            container.innerHTML = '';
+
+            Object.keys(openWindows).forEach((id) => {
+                const item = desktopItems.find(i => i.id === id);
+                if (!item) return;
+
+                const btn = document.createElement('button');
+                btn.onclick = () => toggleDockApp(id);
+                btn.className = `dock-btn p-1.5 shrink-0 ${!openWindows[id].minified ? 'active-win' : ''}`;
+
+                let iconHtml = item.icon.startsWith('http') || item.icon.startsWith('data:image') 
+                    ? `<img src="${item.icon}" class="w-4 h-4 object-contain">`
+                    : `<span class="text-sm">${item.icon}</span>`;
+
+                btn.innerHTML = `
+                    ${iconHtml}
+                    <div class="dock-dot"></div>
+                    <span class="tooltip px-2 py-0.5 text-[10px] font-medium">${item.title}</span>
+                `;
+
+                container.appendChild(btn);
+            });
+        }
+
+        function saveEditorSelection(id) {
+            const editor = document.getElementById(`editor-${id}`);
+            if (!editor) return;
+            
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0 && editor.contains(sel.anchorNode)) {
+                savedRangeForUrl = sel.getRangeAt(0).cloneRange();
+            } else {
+                savedRangeForUrl = null;
+            }
+        }
+
+        function openImageUrlModal(id) {
+            activeEditorForUrl = id;
+            saveEditorSelection(id);
+            const modal = document.getElementById('image-url-modal');
+            const input = document.getElementById('image-url-input-field');
+            if (input) input.value = '';
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeImageUrlModal() {
+            const modal = document.getElementById('image-url-modal');
+            if (modal) modal.classList.add('hidden');
+            activeEditorForUrl = null;
+            savedRangeForUrl = null;
+        }
+
+        function handleConfirmImageUrl(event) {
+            event.preventDefault();
+            const input = document.getElementById('image-url-input-field');
+            const url = input ? input.value.trim() : '';
+
+            if (url && activeEditorForUrl) {
+                insertInlineImageHtml(activeEditorForUrl, url);
+            }
+            closeImageUrlModal();
+        }
+
+        function insertInlineImageHtml(id, src) {
+            const editor = document.getElementById(`editor-${id}`);
+            if (!editor) return;
+
+            editor.focus();
+
+            const imgWrapper = document.createElement('div');
+            imgWrapper.className = 'inline-img-wrapper align-left';
+            imgWrapper.contentEditable = 'false';
+
+            imgWrapper.innerHTML = `
+                <div class="img-toolbar">
+                    <button onclick="alignInlineImg(this, 'left')" title="Izquierda">←</button>
+                    <button onclick="alignInlineImg(this, 'center')" title="Centrar">↔</button>
+                    <button onclick="alignInlineImg(this, 'right')" title="Derecha">→</button>
+                    <button onclick="resizeInlineImg(this, 50)">50%</button>
+                    <button onclick="resizeInlineImg(this, 100)">100%</button>
+                    <button onclick="removeInlineImg(this)" style="color:red;">✕</button>
+                </div>
+                <img src="${src}" style="width: 180px;" onerror="this.onerror=null; this.src='https://placehold.co/300x200/ece9d8/222222?text=Error+Cargar+Imagen';">
+            `;
+
+            const sel = window.getSelection();
+            let inserted = false;
+
+            if (savedRangeForUrl && editor.contains(savedRangeForUrl.commonAncestorContainer)) {
+                try {
+                    savedRangeForUrl.deleteContents();
+                    savedRangeForUrl.insertNode(imgWrapper);
+                    
+                    const newRange = document.createRange();
+                    newRange.setStartAfter(imgWrapper);
+                    newRange.setEndAfter(imgWrapper);
+                    if (sel) {
+                        sel.removeAllRanges();
+                        sel.addRange(newRange);
+                    }
+                    inserted = true;
+                } catch(e) {
+                    inserted = false;
+                }
+            }
+
+            if (!inserted) {
+                editor.appendChild(imgWrapper);
+            }
+
+            saveNoteContent(id);
+        }
+
+        function promptInsertImageURL(id) {
+            openImageUrlModal(id);
+        }
+
+        function handleImageUploadInline(id, event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    insertInlineImageHtml(id, e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function alignInlineImg(btn, align) {
+            const wrapper = btn.closest('.inline-img-wrapper');
+            if (wrapper) {
+                wrapper.classList.remove('align-left', 'align-center', 'align-right', 'align-full');
+                wrapper.classList.add(`align-${align}`);
+                const editor = wrapper.closest('.rich-note-editor');
+                if (editor) {
+                    const winId = editor.id.replace('editor-', '');
+                    saveNoteContent(winId);
+                }
+            }
+        }
+
+        function resizeInlineImg(btn, percent) {
+            const wrapper = btn.closest('.inline-img-wrapper');
+            if (wrapper) {
+                const img = wrapper.querySelector('img');
+                if (img) {
+                    if (percent === 100) {
+                        wrapper.classList.add('align-full');
+                        img.style.width = '100%';
+                    } else {
+                        wrapper.classList.remove('align-full');
+                        img.style.width = `${percent}%`;
+                    }
+                }
+                const editor = wrapper.closest('.rich-note-editor');
+                if (editor) {
+                    const winId = editor.id.replace('editor-', '');
+                    saveNoteContent(winId);
+                }
+            }
+        }
+
+        function removeInlineImg(btn) {
+            const wrapper = btn.closest('.inline-img-wrapper');
+            if (wrapper) {
+                const editor = wrapper.closest('.rich-note-editor');
+                wrapper.remove();
+                if (editor) {
+                    const winId = editor.id.replace('editor-', '');
+                    saveNoteContent(winId);
+                }
+            }
+        }
+
+        function saveNoteContent(id) {
+            const item = desktopItems.find(i => i.id === id);
+            const editor = document.getElementById(`editor-${id}`);
+            if (item && editor) {
+                item.content = editor.innerHTML;
+                saveState();
+            }
+        }
+
+        function updateItemTitle(id, newTitle) {
+            const item = desktopItems.find(i => i.id === id);
+            if (item) {
+                item.title = newTitle || 'Sin título';
+                saveState();
+                renderDesktop();
+                updateDynamicDock();
+            }
+        }
+
+        function deleteDesktopItem(id) {
+            closeWindow(id);
+            desktopItems = desktopItems.filter(i => i.id !== id);
+            saveState();
+            renderDesktop();
+        }
+
+        function toggleHeartLike(btn) {
+            btn.classList.toggle('active');
+        }
+
+        function makeWindowDraggable(winEl, id) {
+            const header = winEl.querySelector('.y2k-header');
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            header.addEventListener('mousedown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.classList.contains('retro-win-control')) return;
+                isDragging = true;
+                bringToFront(id);
+                offsetX = e.clientX - winEl.offsetLeft;
+                offsetY = e.clientY - winEl.offsetTop;
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                winEl.style.left = `${e.clientX - offsetX}px`;
+                winEl.style.top = `${e.clientY - offsetY}px`;
+            });
+
+            document.addEventListener('mouseup', () => { isDragging = false; });
+        }
+
+        function openNewModal() {
+            document.getElementById('new-item-modal').classList.remove('hidden');
+        }
+
+        function closeNewModal() {
+            document.getElementById('new-item-modal').classList.add('hidden');
+        }
+
+        function handleCreateItem(event) {
+            event.preventDefault();
+            const title = document.getElementById('item-title').value;
+            const icon = document.getElementById('item-icon').value || '📁';
+            const noteBody = document.getElementById('item-note-body').value;
+
+            const pos = getRandomPosition(desktopItems.length);
+
+            const newItem = {
+                id: Date.now().toString(),
+                title,
+                icon,
+                content: noteBody ? noteBody.replace(/\n/g, '<br>') : '',
+                x: pos.x,
+                y: pos.y
+            };
+
+            desktopItems.push(newItem);
+            saveState();
+            renderDesktop();
+            closeNewModal();
+            document.getElementById('new-item-form').reset();
+            openWindow(newItem);
+        }
+
+        function resetDesktop() {
+            desktopItems = JSON.parse(JSON.stringify(defaultItems));
+            currentWallpaper = defaultWallpaper;
+            setWallpaper(defaultWallpaper);
+            applyPresetTheme('cyan');
+            
+            Object.keys(openWindows).forEach(id => closeWindow(id));
+            shuffleItems();
+        }
+    </script>
+</body>
+</html>

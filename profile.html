@@ -110,7 +110,7 @@
       object-fit: cover;
     }
 
-    /* Acciones del Perfil */
+    /* Acciones */
     .profile-actions {
       display: flex;
       justify-content: flex-end;
@@ -190,7 +190,7 @@
       color: #14171a;
     }
 
-    /* Publicación Fijada (Pinned Post) Personalizable */
+    /* Publicación Fijada (Pinned Post) */
     .pinned-post {
       padding: 10px 14px;
       border-top: 1px solid #f0f3f5;
@@ -324,7 +324,7 @@
 
       <div class="profile-meta">
         <span class="meta-item">📍 <span id="metaLoc" contenteditable="true">location</span></span>
-        <span class="meta-item">📅 Joined <span id="metaDate" contenteditable="true">June 2020</span></span>
+        <span class="meta-item">📅 <span id="metaDate" contenteditable="true">Joined June 2020</span></span>
         <span class="meta-item">🔗 <span id="metaLink" contenteditable="true">https://link.com/url</span></span>
       </div>
 
@@ -334,14 +334,14 @@
       </div>
     </div>
 
-    <!-- Publicación Fijada (Pinned Post Personalizable) -->
+    <!-- Publicación Fijada (Pinned Post) -->
     <div class="pinned-post">
       <div class="pinned-label" id="pinnedLabel" contenteditable="true">📌 Pinned</div>
       <div class="post-header">
         <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" class="post-avatar" id="postAvatarImg">
         <div class="post-meta">
           <span class="post-author" id="postAuthor" contenteditable="true">name</span>
-          <span class="post-time" id="postHandleTime" contenteditable="true">@users · 1 hrs</span>
+          <span class="post-time" id="postHandleTime" contenteditable="true">@user · 19 hrs</span>
         </div>
       </div>
       <div class="post-text" id="postText" contenteditable="true">
@@ -371,11 +371,11 @@
         <input type="text" id="inPostAvatar">
       </div>
       <div class="form-group">
-        <label>URL Imagen Post 1 (Izquierda):</label>
+        <label>URL Imagen Post 1:</label>
         <input type="text" id="inImg1">
       </div>
       <div class="form-group">
-        <label>URL Imagen Post 2 (Derecha):</label>
+        <label>URL Imagen Post 2:</label>
         <input type="text" id="inImg2">
       </div>
       <div class="modal-actions">
@@ -386,7 +386,47 @@
   </div>
 
   <script>
+    // =============================================================
+    // CONFIGURA AQUÍ TUS VALORES POR DEFECTO PERMANENTES
+    // De esta manera, si Notion recarga el iFrame, cargará esta info fija
+    // =============================================================
+    const DEFAULT_DATA = {
+      domain: "user",
+      name: "name",
+      handle: "@user",
+      bio: "put your bio here this design was made for Notion!",
+      location: "location",
+      date: "Joined June 2020",
+      link: "https://link.com/url",
+      followers: "2,9k",
+      following: "19",
+      pinnedLabel: "📌 Pinned",
+      postAuthor: "name",
+      postTime: "@user · 19 hrs",
+      postText: "— to navigate this site, click the pfp to go to the home page :)",
+      bannerImg: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800",
+      avatarImg: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
+      postAvatarImg: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300",
+      postImg1: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500",
+      postImg2: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=500"
+    };
+
     // Referencias DOM
+    const siteDomain = document.getElementById('siteDomain');
+    const profName = document.getElementById('profName');
+    const profHandle = document.getElementById('profHandle');
+    const profBio = document.getElementById('profBio');
+    const metaLoc = document.getElementById('metaLoc');
+    const metaDate = document.getElementById('metaDate');
+    const metaLink = document.getElementById('metaLink');
+    const statFollowers = document.getElementById('statFollowers');
+    const statFollowing = document.getElementById('statFollowing');
+
+    const pinnedLabel = document.getElementById('pinnedLabel');
+    const postAuthor = document.getElementById('postAuthor');
+    const postHandleTime = document.getElementById('postHandleTime');
+    const postText = document.getElementById('postText');
+
     const bannerImg = document.getElementById('bannerImg');
     const avatarImg = document.getElementById('avatarImg');
     const postAvatarImg = document.getElementById('postAvatarImg');
@@ -398,34 +438,51 @@
     const inPostAvatar = document.getElementById('inPostAvatar');
     const inImg1 = document.getElementById('inImg1');
     const inImg2 = document.getElementById('inImg2');
-
     const modalOverlay = document.getElementById('modalOverlay');
 
-    // Cargar Imágenes
-    bannerImg.src = localStorage.getItem('sc_banner') || bannerImg.src;
-    avatarImg.src = localStorage.getItem('sc_avatar') || avatarImg.src;
-    postAvatarImg.src = localStorage.getItem('sc_post_avatar') || avatarImg.src;
-    postImg1.src = localStorage.getItem('sc_img1') || postImg1.src;
-    postImg2.src = localStorage.getItem('sc_img2') || postImg2.src;
+    // Cargar información (Prioridad: LocalStorage -> Valor por defecto)
+    siteDomain.innerText = localStorage.getItem('sc_domain') || DEFAULT_DATA.domain;
+    profName.innerText = localStorage.getItem('sc_name') || DEFAULT_DATA.name;
+    profHandle.innerText = localStorage.getItem('sc_handle') || DEFAULT_DATA.handle;
+    profBio.innerText = localStorage.getItem('sc_bio') || DEFAULT_DATA.bio;
+    metaLoc.innerText = localStorage.getItem('sc_loc') || DEFAULT_DATA.location;
+    metaDate.innerText = localStorage.getItem('sc_date') || DEFAULT_DATA.date;
+    metaLink.innerText = localStorage.getItem('sc_link') || DEFAULT_DATA.link;
+    statFollowers.innerText = localStorage.getItem('sc_followers') || DEFAULT_DATA.followers;
+    statFollowing.innerText = localStorage.getItem('sc_following') || DEFAULT_DATA.following;
 
-    // Cargar Textos Guardados del Pinned Post
-    const pinnedLabel = document.getElementById('pinnedLabel');
-    const postAuthor = document.getElementById('postAuthor');
-    const postHandleTime = document.getElementById('postHandleTime');
-    const postText = document.getElementById('postText');
+    pinnedLabel.innerText = localStorage.getItem('sc_pinned_label') || DEFAULT_DATA.pinnedLabel;
+    postAuthor.innerText = localStorage.getItem('sc_post_author') || DEFAULT_DATA.postAuthor;
+    postHandleTime.innerText = localStorage.getItem('sc_post_time') || DEFAULT_DATA.postTime;
+    postText.innerText = localStorage.getItem('sc_post_text') || DEFAULT_DATA.postText;
 
-    pinnedLabel.innerText = localStorage.getItem('sc_pinned_label') || pinnedLabel.innerText;
-    postAuthor.innerText = localStorage.getItem('sc_post_author') || postAuthor.innerText;
-    postHandleTime.innerText = localStorage.getItem('sc_post_time') || postHandleTime.innerText;
-    postText.innerText = localStorage.getItem('sc_post_text') || postText.innerText;
+    bannerImg.src = localStorage.getItem('sc_banner') || DEFAULT_DATA.bannerImg;
+    avatarImg.src = localStorage.getItem('sc_avatar') || DEFAULT_DATA.avatarImg;
+    postAvatarImg.src = localStorage.getItem('sc_post_avatar') || DEFAULT_DATA.postAvatarImg;
+    postImg1.src = localStorage.getItem('sc_img1') || DEFAULT_DATA.postImg1;
+    postImg2.src = localStorage.getItem('sc_img2') || DEFAULT_DATA.postImg2;
 
-    // Escuchar ediciones de texto
-    pinnedLabel.addEventListener('input', () => localStorage.setItem('sc_pinned_label', pinnedLabel.innerText));
-    postAuthor.addEventListener('input', () => localStorage.setItem('sc_post_author', postAuthor.innerText));
-    postHandleTime.addEventListener('input', () => localStorage.setItem('sc_post_time', postHandleTime.innerText));
-    postText.addEventListener('input', () => localStorage.setItem('sc_post_text', postText.innerText));
+    // Guardado automático en vivo
+    const bindSave = (element, key) => {
+      element.addEventListener('input', () => localStorage.setItem(key, element.innerText));
+    };
 
-    // Modal
+    bindSave(siteDomain, 'sc_domain');
+    bindSave(profName, 'sc_name');
+    bindSave(profHandle, 'sc_handle');
+    bindSave(profBio, 'sc_bio');
+    bindSave(metaLoc, 'sc_loc');
+    bindSave(metaDate, 'sc_date');
+    bindSave(metaLink, 'sc_link');
+    bindSave(statFollowers, 'sc_followers');
+    bindSave(statFollowing, 'sc_following');
+
+    bindSave(pinnedLabel, 'sc_pinned_label');
+    bindSave(postAuthor, 'sc_post_author');
+    bindSave(postHandleTime, 'sc_post_time');
+    bindSave(postText, 'sc_post_text');
+
+    // Control de Modal
     document.getElementById('openModalBtn').addEventListener('click', () => {
       inBanner.value = bannerImg.src;
       inAvatar.value = avatarImg.src;

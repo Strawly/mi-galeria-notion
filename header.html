@@ -37,13 +37,13 @@
     .font-playfair { font-family: 'Playfair Display', serif; }
     .font-script { font-family: 'Dancing Script', cursive; }
 
-    /* Tarjeta principal cuadrada */
+    /* TARJETA PRINCIPAL: Totalmente cuadrada (border-radius: 0px) */
     .widget-card {
       position: relative;
       width: 100% !important;
       height: 100% !important;
       padding: 14px 20px;
-      border-radius: 0px !important; /* Esquinas totalmente cuadradas */
+      border-radius: 0px !important; /* Esquinas rectas para la tarjeta */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -52,7 +52,7 @@
       transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* BOTÓN DE AJUSTES (Mantiene el círculo con 50%) */
+    /* BOTÓN ⚙️: Conserva el CÍRCULO REDONDO (border-radius: 50%) */
     .config-btn {
       position: absolute;
       top: 8px;
@@ -60,7 +60,7 @@
       z-index: 50;
       background: rgba(255, 255, 255, 0.85);
       border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 50% !important; /* Círculo perfecto conservado */
+      border-radius: 50% !important; /* Mantiene la forma redonda circular */
       width: 28px;
       height: 28px;
       display: flex;
@@ -140,7 +140,7 @@
       background-color: rgba(0, 0, 0, 0.04);
     }
 
-    /* Modal emergente */
+    /* MENÚ DE AJUSTES (MODAL): Mantiene sus ESQUINAS REDONDEADAS estéticas */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -166,7 +166,7 @@
     .modal {
       background: #ffffff;
       padding: 22px;
-      border-radius: 12px;
+      border-radius: 16px !important; /* Esquinas redondeadas para el menú flotante */
       width: 90%;
       max-width: 360px;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
@@ -258,7 +258,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal de Ajustes -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
       <div class="modal-header">

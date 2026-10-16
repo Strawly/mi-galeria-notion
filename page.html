@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Y2K Desktop Widget for Notion</title>
+  <style>
+    :root {
+      --theme-accent: #ffb7d5;
+      --theme-header-bg: linear-gradient(180deg, #ffe5ec 0%, #ffd1dc 100%);
+      --theme-window-bg: rgba(255, 255, 255, 0.92);
+      --theme-dock-bg: rgba(255, 255, 255, 0.65);
+      --theme-border: rgba(255, 183, 213, 0.6);
+      --theme-text: #4a3e4e;
+      --theme-shadow: rgba(255, 182, 193, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #fce4ec;
+      color: var(--theme-text);
+    }
+
+    /* Desktop Canvas */
+    #desktop {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 0.3s ease;
+    }
+
+    /* Desktop Icons */
+    .icon-item {
+      position: absolute;
+      width: 86px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      padding: 8px;
+      border-radius: 12px;
+      transition: transform 0.15s ease, background-color 0.2s ease;
+      z-index: 10;
+    }
+
+    .icon-item:active {
+      cursor: grabbing;
+      transform: scale(0.95);
+    }
+
+    .icon-item:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(4px);
+    }
+
+    .icon-visual {
+      width: 52px;
+      height: 52px;
+      font-size: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12));
+    }
+
+    .icon-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .icon-label {
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      color: #333;
+      text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9), 0 0 2px rgba(255, 255, 255, 0.8);
+      word-break: break-word;
+      line-height: 1.2;
+    }
+
+    /* Floating Windows (Y2K / Soft Pastel Style) */
+    .window {
+      position: absolute;
+      width: 380px;
+      min-height: 260px;
+      background: var(--theme-window-bg);
+      backdrop-filter: blur(12px);
+      border: 2px solid var(--theme-border);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px var(--theme-shadow), 0 4px 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 100;
+      animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .window.minimized {
+      display: none !important;
+    }
+
+    .window-header {
+      height: 38px;
+      background: var(--theme-header-bg);
+      border-bottom: 1px solid var(--theme-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      cursor: move;
+    }
+
+    .window-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--theme-text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .win-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--theme-text);
+      font-size: 12px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+      transition: all 0.15s ease;
+    }
+
+    .win-btn:hover {
+      background: #ffffff;
+      transform: scale(1.1);
+    }
+
+    .win-btn.close:hover {
+      background: #ff7675;
+      color: white;
+    }
+
+    .window-body {
+      flex: 1;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      max-height: 480px;
+    }
+
+    /* Word-like Editor Toolbar */
+    .editor-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--theme-border);
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .tool-btn {
+      padding: 4px 10px;
+      background: white;
+      border: 1px solid var(--theme-border);
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--theme-text);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tool-btn:hover {
+      background: var(--theme-accent);
+      color: white;
+    }
+
+    /* Editable Canvas Content */
+    .note-editor {
+      flex: 1;
+      min-height: 180px;
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      padding: 12px;
+      outline: none;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #333;
+      overflow-y: auto;
+      user-select: text;
+    }
+
+    .note-editor img {
+      max-width: 100%;
+      border-radius: 14px;
+      margin: 8px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: block;
+    }
+
+    .note-editor img:hover {
+      transform: scale(1.01);
+      box-shadow: 0 6px 16px var(--theme-shadow);
+    }
+
+    .note-editor img.align-left {
+      margin-right: auto;
+      margin-left: 0;
+    }
+
+    .note-editor img.align-center {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .note-editor img.align-right {
+      margin-left: auto;
+      margin-right: 0;
+    }
+
+    /* Floating Image Alignment Toolbar */
+    #image-align-bar {
+      position: absolute;
+      display: none;
+      background: white;
+      border: 1px solid var(--theme-border);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      border-radius: 20px;
+      padding: 4px 8px;
+      gap: 6px;
+      z-index: 1000;
+    }
+
+    #image-align-bar button {
+      border: none;
+      background: transparent;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 12px;
+    }
+
+    #image-align-bar button:hover {
+      background: var(--theme-accent);
+      color: white;
+    }
+
+    /* Dock (Liquid Glass Y2K Style) */
+    #dock-container {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 500;
+    }
+
+    #dock {
+      background: var(--theme-dock-bg);
+      backdrop-filter: blur(16px) saturate(180%);
+      border: 2px solid var(--theme-border);
+      border-radius: 30px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 25px var(--theme-shadow), 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .dock-item {
+      width: 44px;
+      height: 44px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      position: relative;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .dock-item:hover {
+      transform: translateY(-6px) scale(1.15);
+      background: white;
+      box-shadow: 0 6px 14px var(--theme-shadow);
+    }
+
+    .dock-item img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .dock-dot {
+      position: absolute;
+      bottom: -4px;
+      width: 5px;
+      height: 5px;
+      background-color: var(--theme-text);
+      border-radius: 50%;
+      display: none;
+    }
+
+    .dock-item.active .dock-dot {
+      display: block;
+    }
+
+    .dock-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--theme-border);
+      margin: 0 2px;
+    }
+
+    /* Modal / Palette Settings Form */
+    .color-presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .preset-btn {
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid var(--theme-border);
+      background: white;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .preset-btn:hover {
+      transform: scale(1.03);
+    }
+
+    .preset-color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .file-input-label {
+      display: inline-block;
+      width: 100%;
+      padding: 8px;
+      text-align: center;
+      background: white;
+      border: 1px dashed var(--theme-border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .file-input-label:hover {
+      background: #fafafa;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .setting-group {
+      margin-bottom: 12px;
+    }
+
+    .setting-group label {
+      font-size: 12px;
+      font-weight:bold;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .setting-group input[type="text"] {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--theme-border);
+      outline: none;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="desktop">
+    <!-- Desktop Icons will be rendered dynamically -->
+    <div id="windows-container"></div>
+  </div>
+
+  <!-- Dock -->
+  <div id="dock-container">
+    <div id="dock">
+      <div class="dock-item" title="Cambiar Tema" onclick="openThemeSettings()">🎨</div>
+      <div class="dock-item" title="Cambiar Fondo" onclick="openWallpaperSettings()">🖼️</div>
+      <div class="dock-item" title="Aleatorizar Posiciones" onclick="randomizeIcons()">🎲</div>
+      <div class="dock-item" title="Agregar Nuevo Ícono" onclick="openNewIconModal()">➕</div>
+      <div class="dock-divider"></div>
+      <div id="dynamic-dock-items" style="display: flex; gap: 10px;"></div>
+    </div>
+  </div>
+
+  <!-- Floating Image Alignment Toolbar -->
+  <div id="image-align-bar">
+    <button onclick="alignSelectedImage('left')">◀ Izq</button>
+    <button onclick="alignSelectedImage('center')">▲ Centro</button>
+    <button onclick="alignSelectedImage('right')">▶ Der</button>
+  </div>
+
+  <script>
+    // System Data & Defaults
+    const defaultIcons = [
+      { id: 'note-1', title: 'Sobre Mí', type: 'note', icon: '🎀', x: 40, y: 40, content: '<h2>¡Hola! 🌸</h2><p>Bienvenid@ a mi espacio Y2K. Haz doble clic para editar estas notas.</p>' },
+      { id: 'note-2', title: 'Tareas', type: 'note', icon: '📝', x: 40, y: 150, content: '<ul><li>Organizar apuntes</li><li>Diseñar widget de Notion</li><li>Tomar café ☕</li></ul>' },
+      { id: 'note-3', title: 'Inspiración', type: 'note', icon: '✨', x: 40, y: 260, content: '<p>Colección de ideas y estética pastel.</p>' }
+    ];
+
+    const themePresets = {
+      pink: {
+        accent: '#ffb7d5',
+        header: 'linear-gradient(180deg, #ffe5ec 0%, #ffd1dc 100%)',
+        windowBg: 'rgba(255, 255, 255, 0.92)',
+        dockBg: 'rgba(255, 255, 255, 0.65)',
+        border: 'rgba(255, 183, 213, 0.6)',
+        shadow: 'rgba(255, 182, 193, 0.35)'
+      },
+      lavender: {
+        accent: '#d8b4fe',
+        header: 'linear-gradient(180deg, #f3e8ff 0%, #e9d5ff 100%)',
+        windowBg: 'rgba(255, 255, 255, 0.92)',
+        dockBg: 'rgba(255, 255, 255, 0.65)',
+        border: 'rgba(216, 180, 254, 0.6)',
+        shadow: 'rgba(216, 180, 254, 0.35)'
+      },
+      cyan: {
+        accent: '#a5f3fc',
+        header: 'linear-gradient(180deg, #ecfeff 0%, #cff4fc 100%)',
+        windowBg: 'rgba(255, 255, 255, 0.92)',
+        dockBg: 'rgba(255, 255, 255, 0.65)',
+        border: 'rgba(165, 243, 252, 0.6)',
+        shadow: 'rgba(165, 243, 252, 0.35)'
+      },
+      green: {
+        accent: '#bbf7d0',
+        header: 'linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%)',
+        windowBg: 'rgba(255, 255, 255, 0.92)',
+        dockBg: 'rgba(255, 255, 255, 0.65)',
+        border: 'rgba(187, 247, 208, 0.6)',
+        shadow: 'rgba(187, 247, 208, 0.35)'
+      },
+      peach: {
+        accent: '#fed7aa',
+        header: 'linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%)',
+        windowBg: 'rgba(255, 255, 255, 0.92)',
+        dockBg: 'rgba(255, 255, 255, 0.65)',
+        border: 'rgba(254, 215, 170, 0.6)',
+        shadow: 'rgba(254, 215, 170, 0.35)'
+      },
+      dark: {
+        accent: '#f472b6',
+        header: 'linear-gradient(180deg, #374151 0%, #1f2937 100%)',
+        windowBg: 'rgba(31, 41, 55, 0.92)',
+        dockBg: 'rgba(31, 41, 55, 0.75)',
+        border: 'rgba(244, 114, 182, 0.4)',
+        shadow: 'rgba(0, 0, 0, 0.5)'
+      }
+    };
+
+    let icons = JSON.parse(localStorage.getItem('y2k_icons')) || defaultIcons;
+    let openWindows = {};
+    let activeImageTarget = null;
+    let maxZIndex = 100;
+
+    // Initialize Widget
+    document.addEventListener('DOMContentLoaded', () => {
+      loadWallpaper();
+      loadTheme();
+      renderIcons();
+      setupGlobalImageAligner();
+    });
+
+    // Render Desktop Icons
+    function renderIcons() {
+      const desktop = document.getElementById('desktop');
+      // Clear old icons except windows
+      document.querySelectorAll('.icon-item').forEach(el => el.remove());
+
+      icons.forEach(item => {
+        const iconEl = document.createElement('div');
+        iconEl.className = 'icon-item';
+        iconEl.id = `icon-${item.id}`;
+        iconEl.style.left = `${item.x}px`;
+        iconEl.style.top = `${item.y}px`;
+
+        const isImage = item.icon.startsWith('http') || item.icon.startsWith('data:');
+        const iconVisualHtml = isImage 
+          ? `<img src="${item.icon}" alt="icon"/>` 
+          : item.icon;
+
+        iconEl.innerHTML = `
+          <div class="icon-visual">${iconVisualHtml}</div>
+          <div class="icon-label">${item.title}</div>
+        `;
+
+        // Dragging Desktop Icons
+        makeDraggableIcon(iconEl, item);
+
+        // Open Window on Double Click / Touch
+        iconEl.addEventListener('dblclick', () => openNoteWindow(item));
+
+        desktop.appendChild(iconEl);
+      });
+    }
+
+    // Draggable Icons Logic
+    function makeDraggableIcon(element, itemData) {
+      let isDragging = false;
+      let startX, startY, origX, origY;
+
+      element.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        origX = element.offsetLeft;
+        origY = element.offsetTop;
+        element.style.zIndex = 1000;
+
+        function onMouseMove(e) {
+          if (!isDragging) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          element.style.left = `${origX + dx}px`;
+          element.style.top = `${origY + dy}px`;
+        }
+
+        function onMouseUp() {
+          if (isDragging) {
+            isDragging = false;
+            itemData.x = element.offsetLeft;
+            itemData.y = element.offsetTop;
+            element.style.zIndex = 10;
+            saveIcons();
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+          }
+        }
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      });
+    }
+
+    // Open Note Application Window
+    function openNoteWindow(item) {
+      if (openWindows[item.id]) {
+        restoreWindow(item.id);
+        return;
+      }
+
+      maxZIndex++;
+      const win = document.createElement('div');
+      win.className = 'window';
+      win.id = `win-${item.id}`;
+      win.style.left = `${Math.min(window.innerWidth - 400, Math.max(20, item.x + 60))}px`;
+      win.style.top = `${Math.min(window.innerHeight - 340, Math.max(20, item.y + 20))}px`;
+      win.style.zIndex = maxZIndex;
+
+      win.innerHTML = `
+        <div class="window-header" onmousedown="bringToFront('win-${item.id}')">
+          <div class="window-title"><span>${item.icon}</span> ${item.title}</div>
+          <div class="window-controls">
+            <button class="win-btn" onclick="toggleFavorite('${item.id}')">♥</button>
+            <button class="win-btn" onclick="minimizeWindow('${item.id}')">—</button>
+            <button class="win-btn close" onclick="closeWindow('${item.id}')">×</button>
+          </div>
+        </div>
+        <div class="window-body" onclick="bringToFront('win-${item.id}')">
+          <div class="editor-toolbar">
+            <button class="tool-btn" onclick="execCmd('bold')"><b>B</b></button>
+            <button class="tool-btn" onclick="execCmd('italic')"><i>I</i></button>
+            <button class="tool-btn" onclick="execCmd('insertUnorderedList')">• Lista</button>
+            <button class="tool-btn" onclick="insertImagePrompt('${item.id}')">🖼️ URL Imagen</button>
+            <label class="tool-btn">
+              📁 Subir Imagen
+              <input type="file" accept="image/*" onchange="uploadImageToNote(event, '${item.id}')">
+            </label>
+          </div>
+          <div class="note-editor" id="editor-${item.id}" contenteditable="true" oninput="saveNoteContent('${item.id}')">
+            ${item.content || 'Escribe aquí tu nota...'}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('windows-container').appendChild(win);
+      makeDraggableWindow(win);
+
+      openWindows[item.id] = { id: item.id, title: item.title, icon: item.icon, minimized: false };
+      updateDock();
+    }
+
+    // Rich Text Commands
+    function execCmd(command, value = null) {
+      document.execCommand(command, false, value);
+    }
+
+    // Insert Image Inline (Word-Style)
+    function insertImagePrompt(itemId) {
+      const url = prompt('Introduce la URL de la imagen:');
+      if (url) {
+        insertImageAtCursor(itemId, url);
+      }
+    }
+
+    function uploadImageToNote(event, itemId) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          insertImageAtCursor(itemId, e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function insertImageAtCursor(itemId, src) {
+      const editor = document.getElementById(`editor-${itemId}`);
+      editor.focus();
+      const imgHtml = `<img src="${src}" class="align-center" onclick="showAlignBar(event, this)"/>`;
+      document.execCommand('insertHTML', false, imgHtml);
+      saveNoteContent(itemId);
+    }
+
+    // Setup Global Image Alignment Popup
+    function setupGlobalImageAligner() {
+      document.addEventListener('click', (e) => {
+        const alignBar = document.getElementById('image-align-bar');
+        if (e.target.tagName === 'IMG' && e.target.closest('.note-editor')) {
+          activeImageTarget = e.target;
+          const rect = e.target.getBoundingClientRect();
+          alignBar.style.top = `${rect.top + window.scrollY - 36}px`;
+          alignBar.style.left = `${rect.left + (rect.width / 2) - 60}px`;
+          alignBar.style.display = 'flex';
+        } else if (!e.target.closest('#image-align-bar')) {
+          alignBar.style.display = 'none';
+        }
+      });
+    }
+
+    function alignSelectedImage(alignment) {
+      if (activeImageTarget) {
+        activeImageTarget.classList.remove('align-left', 'align-center', 'align-right');
+        activeImageTarget.classList.add(`align-${alignment}`);
+        document.getElementById('image-align-bar').style.display = 'none';
+        
+        // Find parent note and save
+        const editor = activeImageTarget.closest('.note-editor');
+        if (editor) {
+          const itemId = editor.id.replace('editor-', '');
+          saveNoteContent(itemId);
+        }
+      }
+    }
+
+    // Save Note Content to LocalStorage
+    function saveNoteContent(itemId) {
+      const editor = document.getElementById(`editor-${itemId}`);
+      if (!editor) return;
+      const item = icons.find(i => i.id === itemId);
+      if (item) {
+        item.content = editor.innerHTML;
+        saveIcons();
+      }
+    }
+
+    // Window Management
+    function bringToFront(winId) {
+      maxZIndex++;
+      const win = document.getElementById(winId);
+      if (win) win.style.zIndex = maxZIndex;
+    }
+
+    function minimizeWindow(id) {
+      const win = document.getElementById(`win-${id}`);
+      if (win) {
+        win.classList.add('minimized');
+        openWindows[id].minimized = true;
+        updateDock();
+      }
+    }
+
+    function restoreWindow(id) {
+      const win = document.getElementById(`win-${id}`);
+      if (win) {
+        win.classList.remove('minimized');
+        openWindows[id].minimized = false;
+        bringToFront(`win-${id}`);
+        updateDock();
+      }
+    }
+
+    function closeWindow(id) {
+      const win = document.getElementById(`win-${id}`);
+      if (win) win.remove();
+      delete openWindows[id];
+      updateDock();
+    }
+
+    function toggleFavorite(id) {
+      alert('¡Añadido a tus favoritos Y2K! 💖');
+    }
+
+    // Draggable Window Logic
+    function makeDraggableWindow(win) {
+      const header = win.querySelector('.window-header');
+      let isDragging = false, startX, startY, origX, origY;
+
+      header.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('win-btn')) return;
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        origX = win.offsetLeft;
+        origY = win.offsetTop;
+
+        function onMouseMove(e) {
+          if (!isDragging) return;
+          win.style.left = `${origX + (e.clientX - startX)}px`;
+          win.style.top = `${origY + (e.clientY - startY)}px`;
+        }
+
+        function onMouseUp() {
+          isDragging = false;
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+        }
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      });
+    }
+
+    // Update Dock
+    function updateDock() {
+      const dockContainer = document.getElementById('dynamic-dock-items');
+      dockContainer.innerHTML = '';
+
+      Object.values(openWindows).forEach(win => {
+        const item = document.createElement('div');
+        item.className = `dock-item ${win.minimized ? '' : 'active'}`;
+        item.title = win.title;
+        item.innerHTML = `
+          <span>${win.icon}</span>
+          <div class="dock-dot"></div>
+        `;
+        item.onclick = () => {
+          if (win.minimized) restoreWindow(win.id);
+          else minimizeWindow(win.id);
+        };
+        dockContainer.appendChild(item);
+      });
+    }
+
+    // Theme Customization Settings Modal
+    function openThemeSettings() {
+      const modalId = 'theme-settings';
+      if (document.getElementById(`win-${modalId}`)) {
+        restoreWindow(modalId);
+        return;
+      }
+
+      maxZIndex++;
+      const win = document.createElement('div');
+      win.className = 'window';
+      win.id = `win-${modalId}`;
+      win.style.left = 'calc(50vw - 190px)';
+      win.style.top = 'calc(50vh - 160px)';
+      win.style.zIndex = maxZIndex;
+
+      win.innerHTML = `
+        <div class="window-header">
+          <div class="window-title">🎨 Configurar Tema Y2K</div>
+          <div class="window-controls">
+            <button class="win-btn close" onclick="closeWindow('${modalId}')">×</button>
+          </div>
+        </div>
+        <div class="window-body">
+          <div class="setting-group">
+            <label>Paletas Predefinidas</label>
+            <div class="color-presets">
+              <button class="preset-btn" onclick="applyPreset('pink')"><div class="preset-color-dot" style="background:#ffb7d5"></div> Pink</button>
+              <button class="preset-btn" onclick="applyPreset('lavender')"><div class="preset-color-dot" style="background:#d8b4fe"></div> Lavender</button>
+              <button class="preset-btn" onclick="applyPreset('cyan')"><div class="preset-color-dot" style="background:#a5f3fc"></div> Cyan</button>
+              <button class="preset-btn" onclick="applyPreset('green')"><div class="preset-color-dot" style="background:#bbf7d0"></div> Matcha</button>
+              <button class="preset-btn" onclick="applyPreset('peach')"><div class="preset-color-dot" style="background:#fed7aa"></div> Peach</button>
+              <button class="preset-btn" onclick="applyPreset('dark')"><div class="preset-color-dot" style="background:#374151"></div> Dark</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('windows-container').appendChild(win);
+      makeDraggableWindow(win);
+      openWindows[modalId] = { id: modalId, title: 'Tema', icon: '🎨', minimized: false };
+      updateDock();
+    }
+
+    function applyPreset(presetKey) {
+      const theme = themePresets[presetKey];
+      if (!theme) return;
+
+      document.documentElement.style.setProperty('--theme-accent', theme.accent);
+      document.documentElement.style.setProperty('--theme-header-bg', theme.header);
+      document.documentElement.style.setProperty('--theme-window-bg', theme.windowBg);
+      document.documentElement.style.setProperty('--theme-dock-bg', theme.dockBg);
+      document.documentElement.style.setProperty('--theme-border', theme.border);
+      document.documentElement.style.setProperty('--theme-shadow', theme.shadow);
+
+      localStorage.setItem('y2k_theme', JSON.stringify(theme));
+    }
+
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('y2k_theme');
+      if (savedTheme) {
+        const theme = JSON.parse(savedTheme);
+        document.documentElement.style.setProperty('--theme-accent', theme.accent);
+        document.documentElement.style.setProperty('--theme-header-bg', theme.header);
+        document.documentElement.style.setProperty('--theme-window-bg', theme.windowBg);
+        document.documentElement.style.setProperty('--theme-dock-bg', theme.dockBg);
+        document.documentElement.style.setProperty('--theme-border', theme.border);
+        document.documentElement.style.setProperty('--theme-shadow', theme.shadow);
+      }
+    }
+
+    // Wallpaper Controls
+    function openWallpaperSettings() {
+      const modalId = 'wallpaper-settings';
+      if (document.getElementById(`win-${modalId}`)) {
+        restoreWindow(modalId);
+        return;
+      }
+
+      maxZIndex++;
+      const win = document.createElement('div');
+      win.className = 'window';
+      win.id = `win-${modalId}`;
+      win.style.left = 'calc(50vw - 190px)';
+      win.style.top = 'calc(50vh - 140px)';
+      win.style.zIndex = maxZIndex;
+
+      win.innerHTML = `
+        <div class="window-header">
+          <div class="window-title">🖼️ Fondo de Pantalla</div>
+          <div class="window-controls">
+            <button class="win-btn close" onclick="closeWindow('${modalId}')">×</button>
+          </div>
+        </div>
+        <div class="window-body">
+          <div class="setting-group">
+            <label>URL de Imagen</label>
+            <input type="text" id="wp-url" placeholder="https://ejemplo.com/fondo.jpg">
+            <button class="tool-btn" style="margin-top: 6px; width:100%; justify-content:center;" onclick="setWallpaperFromUrl()">Aplicar URL</button>
+          </div>
+          <div class="setting-group">
+            <label>Subir desde tu equipo</label>
+            <label class="file-input-label">
+              📁 Seleccionar Archivo
+              <input type="file" accept="image/*" onchange="uploadWallpaper(event)">
+            </label>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('windows-container').appendChild(win);
+      makeDraggableWindow(win);
+      openWindows[modalId] = { id: modalId, title: 'Fondo', icon: '🖼️', minimized: false };
+      updateDock();
+    }
+
+    function setWallpaperFromUrl() {
+      const url = document.getElementById('wp-url').value;
+      if (url) {
+        document.getElementById('desktop').style.backgroundImage = `url('${url}')`;
+        localStorage.setItem('y2k_wallpaper', url);
+      }
+    }
+
+    function uploadWallpaper(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('desktop').style.backgroundImage = `url('${e.target.result}')`;
+          localStorage.setItem('y2k_wallpaper', e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function loadWallpaper() {
+      const savedWp = localStorage.getItem('y2k_wallpaper');
+      if (savedWp) {
+        document.getElementById('desktop').style.backgroundImage = `url('${savedWp}')`;
+      }
+    }
+
+    // Randomize Icons
+    function randomizeIcons() {
+      const maxX = window.innerWidth - 120;
+      const maxY = window.innerHeight - 160;
+
+      icons.forEach(item => {
+        item.x = Math.floor(Math.random() * (maxX - 40)) + 40;
+        item.y = Math.floor(Math.random() * (maxY - 40)) + 40;
+      });
+
+      saveIcons();
+      renderIcons();
+    }
+
+    // Add Custom Icon Modal
+    function openNewIconModal() {
+      const title = prompt('Título de la nota:', 'Nueva Nota');
+      const icon = prompt('Ícono (Emoji o URL):', '🎀');
+
+      if (title && icon) {
+        const newIcon = {
+          id: `note-${Date.now()}`,
+          title: title,
+          type: 'note',
+          icon: icon,
+          x: 100,
+          y: 100,
+          content: '<p>Contenido inicial...</p>'
+        };
+        icons.push(newIcon);
+        saveIcons();
+        renderIcons();
+      }
+    }
+
+    // Persistence Helper
+    function saveIcons() {
+      localStorage.setItem('y2k_icons', JSON.stringify(icons));
+    }
+  </script>
+</body>
+</html>

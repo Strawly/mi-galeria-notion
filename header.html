@@ -4,18 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notion Header Widget</title>
-  <!-- Fuentes desde Google Fonts -->
+  <!-- Fuentes estéticas desde Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
 
   <style>
-    /* Reset estricto para eliminar cualquier marco o fondo blanco externo */
+    /* Reset total y transparencia absoluta para eliminar marcos de página web */
     html, body {
       margin: 0 !important;
       padding: 0 !important;
       width: 100% !important;
-      height: auto !important; /* Mantiene solo el alto del widget */
+      height: auto !important; /* Mantiene solo el tamaño real de la tarjeta */
       background: transparent !important;
       background-color: transparent !important;
       overflow: hidden !important;
@@ -30,20 +30,20 @@
       box-sizing: border-box;
     }
 
-    /* Tipografías */
+    /* Tipografías seleccionables */
     .font-serif { font-family: 'Georgia', 'Times New Roman', serif; }
     .font-sans { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
     .font-mono { font-family: 'Courier New', Courier, monospace; }
     .font-playfair { font-family: 'Playfair Display', serif; }
     .font-script { font-family: 'Dancing Script', cursive; }
 
-    /* Tarjeta Principal Ajustada */
+    /* Tarjeta integrada del widget */
     .widget-card {
       position: relative;
       width: 100%;
       max-width: 650px;
-      margin: 4px auto; /* Centrado con margen mínimo */
-      padding: 20px 24px;
+      margin: 2px auto; /* Centrado estricto */
+      padding: 18px 24px;
       border-radius: 18px;
       display: flex;
       flex-direction: column;
@@ -52,11 +52,11 @@
       transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* Botón ⚙️ discreto */
+    /* Botón ⚙️ de configuración */
     .config-btn {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 8px;
+      right: 8px;
       z-index: 50;
       background: rgba(255, 255, 255, 0.85);
       border: 1px solid rgba(0, 0, 0, 0.08);
@@ -106,7 +106,7 @@
       background-color: rgba(0, 0, 0, 0.04);
     }
 
-    /* Fila Inferior: Fecha + Texto */
+    /* Fila Inferior: Fecha + Subtítulo */
     .subheader-row {
       display: flex;
       justify-content: space-between;

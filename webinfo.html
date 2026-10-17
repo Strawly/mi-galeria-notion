@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" style="--bg-main: #f7f4ea; --bg-header: #f4efe0; --bg-marquee: #aa9f8f; --text-main: #333333; --border-color: #2d2d2d; --btn-bg: #000000; --btn-text: #ffffff; --btn-active: #4a5d43; --tag-bg: #dde5d3; --tag-text: #4a5d43; --cat-color: #8c7e6c;"><head>
+<html lang="es" style="--bg-main: #f7f4ea; --bg-header: #f4efe0; --bg-marquee: #aa9f8f; --text-main: #333333; --border-color: #2d2d2d; --btn-bg: #000000; --btn-text: #ffffff; --btn-active: #4a5d43; --tag-bg: #dde5d3; --tag-text: #4a5d43; --cat-color: #8c7e6c;">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retro Cute Notion Widget</title>
@@ -8,8 +9,8 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600&amp;family=Quicksand:wght@400;600;700&amp;display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script type="module">
@@ -17,7 +18,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration setup
+        // Firebase Setup
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'notion-widget-app';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "demo-api-key",
@@ -46,12 +47,17 @@
                 } else {
                     await signInAnonymously(auth);
                 }
-                console.log("Firebase Auth success");
+                console.log("Firebase Auth OK");
                 window.isAuthReady = true;
-                await loadWidgetState();
+                if (typeof window.loadWidgetState === 'function') {
+                    await window.loadWidgetState();
+                }
             } catch (err) {
-                console.error("Auth error:", err);
+                console.warn("Auth error or offline mode active:", err);
                 window.isAuthReady = false;
+                if (typeof window.loadWidgetState === 'function') {
+                    await window.loadWidgetState();
+                }
             }
         }
         initAuth();
@@ -156,13 +162,11 @@
             min-width: 0;
         }
 
-        /* Single block takes 100% width */
         .tab-content > .widget-block:only-child {
             flex: 1 1 100% !important;
             max-width: 100% !important;
         }
 
-        /* Two blocks: Image stays compact fixed width, Text expands to fill remaining space in the same line */
         .tab-content > .widget-block-img {
             flex: 0 0 140px;
             max-width: 180px;
@@ -173,7 +177,6 @@
             max-width: 100%;
         }
 
-        /* When exactly 2 blocks are in a tab, force them to stay in 1 single row */
         .tab-content:has(> .widget-block:nth-child(2):last-child) {
             flex-wrap: nowrap !important;
         }
@@ -183,7 +186,6 @@
             max-width: 100% !important;
         }
 
-        /* When 3 blocks are in a tab, force strictly 1/3 width each in a 3x1 row */
         .tab-content:has(> .widget-block:nth-child(3)) {
             flex-wrap: nowrap !important;
         }
@@ -256,7 +258,6 @@
             border-radius: 50%;
         }
 
-        /* Add Block Button */
         .add-block-btn {
             background-color: var(--btn-bg);
             color: var(--btn-text);
@@ -273,7 +274,6 @@
             transform: scale(1.02);
         }
 
-        /* Formatting Toolbar Buttons & Dropdown Popover */
         .fmt-btn {
             background-color: transparent;
             color: var(--text-main);
@@ -293,7 +293,6 @@
             color: #ffffff;
         }
 
-        /* Compact Format Menu Popup for Text Blocks */
         .fmt-dropdown {
             position: absolute;
             top: 28px;
@@ -314,7 +313,6 @@
             display: none !important;
         }
 
-        /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -339,10 +337,10 @@
         <div class="flex justify-between items-center px-3 py-1.5 border-b-2 border-stone-800 text-xs font-bold text-stone-700 bg-white/50 rounded-t-[10px]">
             <div class="flex items-center gap-1.5 text-stone-700 font-bold text-[11px]">
                 <i class="fa-regular fa-clock text-stone-500"></i>
-                <span id="currentTime" class="tracking-wide">18:25:50</span>
+                <span id="currentTime" class="tracking-wide">00:00:00</span>
             </div>
 
-            <!-- Action buttons for adding text or image blocks -->
+            <!-- Action buttons -->
             <div class="flex items-center gap-1.5">
                 <button id="addBlockBtn" type="button" class="add-block-btn flex items-center gap-1 shadow-sm" title="Añadir bloque de texto">
                     <i class="fa-solid fa-align-left text-[9px]"></i>
@@ -420,7 +418,7 @@
                     </div>
                 </div>
 
-                <!-- Right Side: Navigation Tabs -->
+                <!-- Right Side: Tabs -->
                 <div class="flex items-center gap-1.5 sm:gap-2">
                     <button onclick="switchTab('star')" type="button" class="tab-btn btn-pill px-3 py-1 text-xs flex items-center gap-1 active" data-tab="star" title="Doble clic para editar el texto">
                         <span ondblclick="enableTabEdit(this)" onblur="disableTabEdit(this)" contenteditable="false" spellcheck="false" class="tab-label">☆</span>
@@ -451,25 +449,12 @@
             </div>
         </div>
 
-        <!-- Content Area (Dynamic Grid Layout) -->
+        <!-- Content Area -->
         <div class="p-4 min-h-[220px] relative z-0">
-            
-            <!-- TAB: BYF + DNI -->
-            <div id="tab-byf" class="tab-content hidden">
-            </div>
-
-            <!-- TAB: PROFILE -->
-            <div id="tab-profile" class="tab-content hidden">
-            </div>
-
-            <!-- TAB: LIKES -->
-            <div id="tab-likes" class="tab-content hidden">
-            </div>
-
-            <!-- TAB: STAR -->
-            <div id="tab-star" class="tab-content">
-            </div>
-
+            <div id="tab-byf" class="tab-content hidden"></div>
+            <div id="tab-profile" class="tab-content hidden"></div>
+            <div id="tab-likes" class="tab-content hidden"></div>
+            <div id="tab-star" class="tab-content"></div>
         </div>
 
     </div>
@@ -498,6 +483,8 @@
     </div>
 
     <script>
+        const LOCAL_STORAGE_KEY = 'notion_widget_state_v1';
+
         // Real-time clock logic
         function updateClock() {
             const now = new Date();
@@ -508,7 +495,6 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Switch between tabs
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -520,7 +506,6 @@
             if (activeBtn) activeBtn.classList.add('active');
         }
 
-        // Tab label edit (double click)
         function enableTabEdit(span) {
             span.contentEditable = "true";
             span.focus();
@@ -531,20 +516,16 @@
             triggerAutoSave();
         }
 
-        // Toggle and Close Format Dropdown Menu
         function toggleFmtMenu(button) {
             event.stopPropagation();
             const parent = button.closest('.absolute');
             const menu = parent.querySelector('.fmt-dropdown');
             
-            // Close other format menus
             document.querySelectorAll('.fmt-dropdown').forEach(m => {
                 if (m !== menu) m.classList.add('hidden');
             });
 
-            if (menu) {
-                menu.classList.toggle('hidden');
-            }
+            if (menu) menu.classList.toggle('hidden');
         }
 
         function closeFmtMenu(button) {
@@ -552,12 +533,10 @@
             if (menu) menu.classList.add('hidden');
         }
 
-        // Close dropdowns on outside click
         document.addEventListener('click', () => {
             document.querySelectorAll('.fmt-dropdown').forEach(m => m.classList.add('hidden'));
         });
 
-        // Text Formatting Handlers
         function toggleBold(btn) {
             const block = btn.closest('.widget-block-text');
             const target = block.querySelector('.editable-text-target');
@@ -599,7 +578,6 @@
             }
         }
 
-        // Helper function to create HTML string for Text Block
         function createTextBlockHTML(title = 'Nuevo Título', content = 'Escribe tu contenido aquí...', isBold = false, isItalic = false, alignH = 'left', alignV = 'start') {
             const boldClass = isBold ? 'font-bold' : 'font-normal';
             const italicClass = isItalic ? 'italic' : '';
@@ -651,7 +629,6 @@
             `;
         }
 
-        // Add new text block dynamically
         document.getElementById('addBlockBtn').addEventListener('click', () => {
             const activeTab = document.querySelector('.tab-content:not(.hidden)');
             if (!activeTab) return;
@@ -664,7 +641,6 @@
             triggerAutoSave();
         });
 
-        // Modal Image URL Management
         let currentEditingContainer = null;
 
         document.getElementById('addImageBlockBtn').addEventListener('click', () => {
@@ -722,7 +698,6 @@
             triggerAutoSave();
         }
 
-        // Delete block function
         function deleteBlock(button) {
             const block = button.closest('.widget-block');
             if (block) {
@@ -731,7 +706,6 @@
             }
         }
 
-        // Popover Theme Menu Controls
         function toggleThemeMenu(e) {
             e.stopPropagation();
             const popover = document.getElementById('themePopover');
@@ -742,7 +716,6 @@
             document.getElementById('themePopover').classList.add('hidden');
         }
 
-        // Close popover when clicking outside
         document.addEventListener('click', (e) => {
             const popover = document.getElementById('themePopover');
             if (popover && !popover.contains(e.target)) {
@@ -750,13 +723,11 @@
             }
         });
 
-        // Update CSS custom property variable
         function updateCustomColor(variable, value) {
             document.documentElement.style.setProperty(variable, value);
             triggerAutoSave();
         }
 
-        // Preset Color Palettes
         const presets = {
             caramel: {
                 '--bg-main': '#f7f4ea',
@@ -820,7 +791,6 @@
                 updateCustomColor(key, val);
             }
 
-            // Sync pickers
             if (document.getElementById('pickerBgMain')) document.getElementById('pickerBgMain').value = theme['--bg-main'];
             if (document.getElementById('pickerBgHeader')) document.getElementById('pickerBgHeader').value = theme['--bg-header'];
             if (document.getElementById('pickerBgMarquee')) document.getElementById('pickerBgMarquee').value = theme['--bg-marquee'];
@@ -837,103 +807,110 @@
             if (saveTimeout) clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
                 saveWidgetState();
-            }, 500);
+            }, 300);
         }
 
-        async function saveWidgetState() {
-            if (!window.auth || !window.auth.currentUser || !window.db) return;
-            
-            try {
-                // Collect Theme variables
-                const styles = getComputedStyle(document.documentElement);
-                const themeData = {
-                    '--bg-main': styles.getPropertyValue('--bg-main').trim(),
-                    '--bg-header': styles.getPropertyValue('--bg-header').trim(),
-                    '--bg-marquee': styles.getPropertyValue('--bg-marquee').trim(),
-                    '--text-main': styles.getPropertyValue('--text-main').trim(),
-                    '--btn-bg': styles.getPropertyValue('--btn-bg').trim(),
-                    '--btn-text': styles.getPropertyValue('--btn-text').trim(),
-                    '--btn-active': styles.getPropertyValue('--btn-active').trim(),
-                    '--tag-bg': styles.getPropertyValue('--tag-bg').trim(),
-                    '--tag-text': styles.getPropertyValue('--tag-text').trim(),
-                    '--cat-color': styles.getPropertyValue('--cat-color').trim(),
-                };
+        function collectWidgetState() {
+            const styles = getComputedStyle(document.documentElement);
+            const themeData = {
+                '--bg-main': styles.getPropertyValue('--bg-main').trim(),
+                '--bg-header': styles.getPropertyValue('--bg-header').trim(),
+                '--bg-marquee': styles.getPropertyValue('--bg-marquee').trim(),
+                '--text-main': styles.getPropertyValue('--text-main').trim(),
+                '--btn-bg': styles.getPropertyValue('--btn-bg').trim(),
+                '--btn-text': styles.getPropertyValue('--btn-text').trim(),
+                '--btn-active': styles.getPropertyValue('--btn-active').trim(),
+                '--tag-bg': styles.getPropertyValue('--tag-bg').trim(),
+                '--tag-text': styles.getPropertyValue('--tag-text').trim(),
+                '--cat-color': styles.getPropertyValue('--cat-color').trim(),
+            };
 
-                // Collect Tab Titles
-                const tabTitles = {};
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    const id = btn.getAttribute('data-tab');
-                    const label = btn.querySelector('.tab-label');
-                    if (id && label) {
-                        tabTitles[id] = label.innerHTML;
+            const tabTitles = {};
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                const id = btn.getAttribute('data-tab');
+                const label = btn.querySelector('.tab-label');
+                if (id && label) {
+                    tabTitles[id] = label.innerHTML;
+                }
+            });
+
+            const marqueeText = document.getElementById('marqueeText')?.innerHTML || '';
+
+            const tabsBlocks = {};
+            const tabs = ['star', 'profile', 'byf', 'likes'];
+            
+            tabs.forEach(tabId => {
+                const tabContainer = document.getElementById(`tab-${tabId}`);
+                if (!tabContainer) return;
+
+                const blocks = [];
+                tabContainer.querySelectorAll('.widget-block').forEach(block => {
+                    if (block.classList.contains('widget-block-text')) {
+                        const title = block.querySelector('.tag-highlight')?.innerHTML || 'Título';
+                        const textTarget = block.querySelector('.editable-text-target');
+                        const textContent = textTarget?.innerHTML || '';
+                        const isBold = textTarget?.classList.contains('font-bold') || false;
+                        const isItalic = textTarget?.classList.contains('italic') || false;
+                        
+                        let alignH = 'left';
+                        if (textTarget?.classList.contains('text-center')) alignH = 'center';
+                        if (textTarget?.classList.contains('text-right')) alignH = 'right';
+
+                        let alignV = 'start';
+                        const containerV = block.querySelector('.text-content-area');
+                        if (containerV?.classList.contains('justify-center')) alignV = 'center';
+                        if (containerV?.classList.contains('justify-end')) alignV = 'end';
+
+                        blocks.push({
+                            type: 'text',
+                            title: title,
+                            content: textContent,
+                            isBold: isBold,
+                            isItalic: isItalic,
+                            alignH: alignH,
+                            alignV: alignV
+                        });
+                    } else if (block.classList.contains('widget-block-img')) {
+                        const title = block.querySelector('.tag-highlight')?.innerHTML || 'Imagen';
+                        const imgSrc = block.querySelector('img')?.src || '';
+                        blocks.push({
+                            type: 'image',
+                            title: title,
+                            src: imgSrc
+                        });
                     }
                 });
 
-                // Collect Marquee HTML
-                const marqueeText = document.getElementById('marqueeText')?.innerHTML || '';
+                tabsBlocks[tabId] = blocks;
+            });
 
-                // Collect Blocks for each tab
-                const tabsBlocks = {};
-                const tabs = ['star', 'profile', 'byf', 'likes'];
-                
-                tabs.forEach(tabId => {
-                    const tabContainer = document.getElementById(`tab-${tabId}`);
-                    if (!tabContainer) return;
+            return {
+                theme: themeData,
+                tabTitles: tabTitles,
+                marqueeText: marqueeText,
+                tabsBlocks: tabsBlocks,
+                updatedAt: new Date().toISOString()
+            };
+        }
 
-                    const blocks = [];
-                    tabContainer.querySelectorAll('.widget-block').forEach(block => {
-                        if (block.classList.contains('widget-block-text')) {
-                            const title = block.querySelector('.tag-highlight')?.innerHTML || 'Título';
-                            const textTarget = block.querySelector('.editable-text-target');
-                            const textContent = textTarget?.innerHTML || '';
-                            const isBold = textTarget?.classList.contains('font-bold') || false;
-                            const isItalic = textTarget?.classList.contains('italic') || false;
-                            
-                            // Alignment classes
-                            let alignH = 'left';
-                            if (textTarget?.classList.contains('text-center')) alignH = 'center';
-                            if (textTarget?.classList.contains('text-right')) alignH = 'right';
+        async function saveWidgetState() {
+            const payload = collectWidgetState();
 
-                            let alignV = 'start';
-                            const containerV = block.querySelector('.text-content-area');
-                            if (containerV?.classList.contains('justify-center')) alignV = 'center';
-                            if (containerV?.classList.contains('justify-end')) alignV = 'end';
+            // Save to LocalStorage immediately
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(payload));
+            } catch (err) {
+                console.warn("Could not save to LocalStorage:", err);
+            }
 
-                            blocks.push({
-                                type: 'text',
-                                title: title,
-                                content: textContent,
-                                isBold: isBold,
-                                isItalic: isItalic,
-                                alignH: alignH,
-                                alignV: alignV
-                            });
-                        } else if (block.classList.contains('widget-block-img')) {
-                            const title = block.querySelector('.tag-highlight')?.innerHTML || 'Imagen';
-                            const imgSrc = block.querySelector('img')?.src || '';
-                            blocks.push({
-                                type: 'image',
-                                title: title,
-                                src: imgSrc
-                            });
-                        }
-                    });
-
-                    tabsBlocks[tabId] = blocks;
-                });
-
-                const payload = {
-                    theme: themeData,
-                    tabTitles: tabTitles,
-                    marqueeText: marqueeText,
-                    tabsBlocks: tabsBlocks,
-                    updatedAt: new Date().toISOString()
-                };
-
-                const docRef = window.doc(window.db, 'artifacts', window.appId, 'users', window.auth.currentUser.uid, 'widgetState', 'data');
-                await window.setDoc(docRef, payload);
-            } catch (e) {
-                console.error("Error saving state to Firestore:", e);
+            // Save to Firestore as cloud backup
+            if (window.auth && window.auth.currentUser && window.db && window.doc && window.setDoc) {
+                try {
+                    const docRef = window.doc(window.db, 'artifacts', window.appId, 'users', window.auth.currentUser.uid, 'widgetState', 'data');
+                    await window.setDoc(docRef, payload);
+                } catch (e) {
+                    console.warn("Firestore backup error:", e);
+                }
             }
         }
 
@@ -982,88 +959,104 @@
             return [];
         }
 
-        async function loadWidgetState() {
-            if (!window.auth || !window.auth.currentUser || !window.db) return;
+        window.loadWidgetState = async function() {
+            let data = null;
 
+            // Try reading from LocalStorage first
             try {
-                const docRef = window.doc(window.db, 'artifacts', window.appId, 'users', window.auth.currentUser.uid, 'widgetState', 'data');
-                const docSnap = await window.getDoc(docRef);
-
-                let data = null;
-                if (docSnap.exists()) {
-                    data = docSnap.data();
+                const localDataStr = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (localDataStr) {
+                    data = JSON.parse(localDataStr);
                 }
-
-                // Restore or default Theme
-                if (data && data.theme) {
-                    for (const [key, val] of Object.entries(data.theme)) {
-                        document.documentElement.style.setProperty(key, val);
-                    }
-                    if (document.getElementById('pickerBgMain')) document.getElementById('pickerBgMain').value = data.theme['--bg-main'] || '#f7f4ea';
-                    if (document.getElementById('pickerBgHeader')) document.getElementById('pickerBgHeader').value = data.theme['--bg-header'] || '#f4efe0';
-                    if (document.getElementById('pickerBgMarquee')) document.getElementById('pickerBgMarquee').value = data.theme['--bg-marquee'] || '#aa9f8f';
-                    if (document.getElementById('pickerTextMain')) document.getElementById('pickerTextMain').value = data.theme['--text-main'] || '#333333';
-                    if (document.getElementById('pickerBtnBg')) document.getElementById('pickerBtnBg').value = data.theme['--btn-bg'] || '#000000';
-                    if (document.getElementById('pickerBtnActive')) document.getElementById('pickerBtnActive').value = data.theme['--btn-active'] || '#4a5d43';
-                }
-
-                // Restore Tab Titles
-                if (data && data.tabTitles) {
-                    for (const [tabId, titleHtml] of Object.entries(data.tabTitles)) {
-                        const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"] .tab-label`);
-                        if (btn) btn.innerHTML = titleHtml;
-                    }
-                }
-
-                // Restore Marquee Text
-                if (data && data.marqueeText && document.getElementById('marqueeText')) {
-                    document.getElementById('marqueeText').innerHTML = data.marqueeText;
-                }
-
-                // Restore Blocks
-                const tabs = ['star', 'profile', 'byf', 'likes'];
-                tabs.forEach(tabId => {
-                    const tabContainer = document.getElementById(`tab-${tabId}`);
-                    if (!tabContainer) return;
-
-                    tabContainer.innerHTML = ''; // clear initial fallback content
-
-                    const blocks = (data && data.tabsBlocks && data.tabsBlocks[tabId]) ? data.tabsBlocks[tabId] : createDefaultBlocks(tabId);
-
-                    blocks.forEach(b => {
-                        if (b.type === 'text') {
-                            const newBlock = document.createElement('div');
-                            newBlock.className = 'widget-block widget-block-text pixel-border-sm bg-white/40 p-2.5 rounded-md relative group flex flex-col justify-between';
-                            newBlock.innerHTML = createTextBlockHTML(b.title, b.content, b.isBold, b.isItalic, b.alignH || 'left', b.alignV || 'start');
-                            tabContainer.appendChild(newBlock);
-                        } else if (b.type === 'image') {
-                            const newBlock = document.createElement('div');
-                            newBlock.className = 'widget-block widget-block-img pixel-border-sm bg-white/40 p-2.5 rounded-md relative group flex flex-col justify-between';
-                            newBlock.innerHTML = `
-                                <button onclick="deleteBlock(this)" type="button" class="absolute top-2 right-2 text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition text-xs z-10" title="Eliminar bloque">
-                                    <i class="fa-solid fa-xmark"></i>
-                                </button>
-                                <div class="flex items-center gap-1.5 pb-1.5 mb-1.5 border-b border-stone-300 text-[10px] text-stone-500 font-medium">
-                                    <span class="font-bold">+</span>
-                                    <span class="tag-highlight" contenteditable="true" spellcheck="false">${b.title}</span>
-                                </div>
-                                <div class="image-preview-container" onclick="openImageModal(this)">
-                                    <img src="${b.src}" alt="Preview" onerror="this.src='https://placehold.co/300x200/e2e8f0/475569?text=URL+Invalida'">
-                                </div>
-                            `;
-                            tabContainer.appendChild(newBlock);
-                        }
-                    });
-                });
-            } catch (e) {
-                console.error("Error loading state from Firestore:", e);
+            } catch (err) {
+                console.warn("Error reading from LocalStorage:", err);
             }
-        }
 
-        // Auto save on input changes
+            // Fallback to Firestore if local storage wasn't found
+            if (!data && window.auth && window.auth.currentUser && window.db && window.doc && window.getDoc) {
+                try {
+                    const docRef = window.doc(window.db, 'artifacts', window.appId, 'users', window.auth.currentUser.uid, 'widgetState', 'data');
+                    const docSnap = await window.getDoc(docRef);
+                    if (docSnap.exists()) {
+                        data = docSnap.data();
+                    }
+                } catch (e) {
+                    console.warn("Error loading from Firestore:", e);
+                }
+            }
+
+            // Restore theme
+            if (data && data.theme) {
+                for (const [key, val] of Object.entries(data.theme)) {
+                    document.documentElement.style.setProperty(key, val);
+                }
+                if (document.getElementById('pickerBgMain')) document.getElementById('pickerBgMain').value = data.theme['--bg-main'] || '#f7f4ea';
+                if (document.getElementById('pickerBgHeader')) document.getElementById('pickerBgHeader').value = data.theme['--bg-header'] || '#f4efe0';
+                if (document.getElementById('pickerBgMarquee')) document.getElementById('pickerBgMarquee').value = data.theme['--bg-marquee'] || '#aa9f8f';
+                if (document.getElementById('pickerTextMain')) document.getElementById('pickerTextMain').value = data.theme['--text-main'] || '#333333';
+                if (document.getElementById('pickerBtnBg')) document.getElementById('pickerBtnBg').value = data.theme['--btn-bg'] || '#000000';
+                if (document.getElementById('pickerBtnActive')) document.getElementById('pickerBtnActive').value = data.theme['--btn-active'] || '#4a5d43';
+            }
+
+            // Restore tab titles
+            if (data && data.tabTitles) {
+                for (const [tabId, titleHtml] of Object.entries(data.tabTitles)) {
+                    const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"] .tab-label`);
+                    if (btn) btn.innerHTML = titleHtml;
+                }
+            }
+
+            // Restore marquee
+            if (data && data.marqueeText && document.getElementById('marqueeText')) {
+                document.getElementById('marqueeText').innerHTML = data.marqueeText;
+            }
+
+            // Restore blocks
+            const tabs = ['star', 'profile', 'byf', 'likes'];
+            tabs.forEach(tabId => {
+                const tabContainer = document.getElementById(`tab-${tabId}`);
+                if (!tabContainer) return;
+
+                tabContainer.innerHTML = '';
+
+                const blocks = (data && data.tabsBlocks && data.tabsBlocks[tabId]) ? data.tabsBlocks[tabId] : createDefaultBlocks(tabId);
+
+                blocks.forEach(b => {
+                    if (b.type === 'text') {
+                        const newBlock = document.createElement('div');
+                        newBlock.className = 'widget-block widget-block-text pixel-border-sm bg-white/40 p-2.5 rounded-md relative group flex flex-col justify-between';
+                        newBlock.innerHTML = createTextBlockHTML(b.title, b.content, b.isBold, b.isItalic, b.alignH || 'left', b.alignV || 'start');
+                        tabContainer.appendChild(newBlock);
+                    } else if (b.type === 'image') {
+                        const newBlock = document.createElement('div');
+                        newBlock.className = 'widget-block widget-block-img pixel-border-sm bg-white/40 p-2.5 rounded-md relative group flex flex-col justify-between';
+                        newBlock.innerHTML = `
+                            <button onclick="deleteBlock(this)" type="button" class="absolute top-2 right-2 text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition text-xs z-10" title="Eliminar bloque">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                            <div class="flex items-center gap-1.5 pb-1.5 mb-1.5 border-b border-stone-300 text-[10px] text-stone-500 font-medium">
+                                <span class="font-bold">+</span>
+                                <span class="tag-highlight" contenteditable="true" spellcheck="false">${b.title}</span>
+                            </div>
+                            <div class="image-preview-container" onclick="openImageModal(this)">
+                                <img src="${b.src}" alt="Preview" onerror="this.src='https://placehold.co/300x200/e2e8f0/475569?text=URL+Invalida'">
+                            </div>
+                        `;
+                        tabContainer.appendChild(newBlock);
+                    }
+                });
+            });
+        };
+
+        // Event listeners for auto-saving inputs
         document.addEventListener('input', () => {
             triggerAutoSave();
         });
-    </script>
 
-</body></html>
+        // Load saved state immediately on page parse
+        window.addEventListener('DOMContentLoaded', () => {
+            window.loadWidgetState();
+        });
+    </script>
+</body>
+</html>

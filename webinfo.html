@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="es" style="--bg-main: #f7f4ea; --bg-header: #f4efe0; --bg-marquee: #aa9f8f; --text-main: #333333; --border-color: #2d2d2d; --btn-bg: #000000; --btn-text: #ffffff; --btn-active: #4a5d43; --tag-bg: #dde5d3; --tag-text: #4a5d43; --cat-color: #8c7e6c;"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Cute Notion Widget</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600&amp;family=Quicksand:wght@400;600;700&amp;display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-main: #f7f4ea;
+            --bg-header: #f4efe0;
+            --bg-marquee: #aa9f8f;
+            --text-main: #333333;
+            --border-color: #2d2d2d;
+            --btn-bg: #000000;
+            --btn-text: #ffffff;
+            --btn-active: #4a5d43;
+            --tag-bg: #dde5d3;
+            --tag-text: #4a5d43;
+            --cat-color: #8c7e6c;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Quicksand', sans-serif;
+            transition: all 0.25s ease;
+        }
+
+        .widget-container {
+            background-color: var(--bg-main);
+            border: 2.5px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-bg {
+            background-color: var(--bg-header);
+        }
+
+        .marquee-container {
+            background-color: var(--bg-marquee);
+            color: #ffffff;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 18s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .tab-btn {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1.5px solid var(--border-color);
+            transition: all 0.2s ease;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 500;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background-color: var(--btn-active);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .btn-pill {
+            border-radius: 9999px;
+        }
+
+        .tag-highlight {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .pixel-border-sm {
+            border: 1.5px solid var(--border-color);
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.06);
+        }
+
+        /* Responsive Layout for Dynamic Block Sizes */
+        .tab-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        /* Dynamic Sizing Rules */
+        .tab-content > .widget-block {
+            flex: 1 1 calc(33.333% - 0.75rem);
+            min-width: 0;
+        }
+
+        /* Single block takes 100% width */
+        .tab-content > .widget-block:only-child {
+            flex: 1 1 100%;
+        }
+
+        /* Two blocks: Image stays compact fixed width, Text expands to fill remaining space */
+        .tab-content > .widget-block-img {
+            flex: 0 0 140px;
+            max-width: 180px;
+        }
+
+        .tab-content > .widget-block-text {
+            flex: 1 1 220px;
+        }
+
+        .tab-content.hidden {
+            display: none !important;
+        }
+
+        /* Image & Block Containers */
+        .image-preview-container {
+            width: 100%;
+            height: 110px;
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: rgba(0,0,0,0.03);
+            border: 1px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .image-preview-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Theme Popover Menu */
+        .theme-popover {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            width: 250px;
+            background: var(--bg-main);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+            z-index: 100;
+        }
+
+        .theme-popover.hidden {
+            display: none !important;
+        }
+
+        .color-picker-input {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-color);
+            cursor: pointer;
+            padding: 0;
+            background: transparent;
+        }
+
+        .color-picker-input::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-picker-input::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+
+        /* Add Block Button */
+        .add-block-btn {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--border-color);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+
+        .add-block-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        /* Formatting Toolbar Buttons & Dropdown Popover */
+        .fmt-btn {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .fmt-btn:hover, .fmt-btn.active {
+            background-color: var(--border-color);
+            color: #ffffff;
+        }
+
+        /* Compact Format Menu Popup for Text Blocks */
+        .fmt-dropdown {
+            position: absolute;
+            top: 28px;
+            right: 8px;
+            background: var(--bg-main);
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 130px;
+        }
+
+        .fmt-dropdown.hidden {
+            display: none !important;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 150;
+        }
+
+        .modal-overlay.hidden {
+            display: none !important;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.absolute{position:absolute}.relative{position:relative}.right-2{right:0.5rem}.top-2{top:0.5rem}.z-0{z-index:0}.z-20{z-index:20}.mb-1{margin-bottom:0.25rem}.mb-1\.5{margin-bottom:0.375rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mr-1{margin-right:0.25rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-full{height:100%}.min-h-\[220px\]{min-height:220px}.min-h-\[60px\]{min-height:60px}.min-h-screen{min-height:100vh}.w-11\/12{width:91.666667%}.w-full{width:100%}.max-w-3xl{max-width:48rem}.max-w-md{max-width:28rem}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-start{justify-content:flex-start}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.justify-around{justify-content:space-around}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-8{gap:2rem}.space-y-1\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.375rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.375rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-visible{overflow:visible}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.rounded-t-\[10px\]{border-top-left-radius:10px;border-top-right-radius:10px}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-t{border-top-width:1px}.border-pink-200{--tw-border-opacity:1;border-color:rgb(251 207 232 / var(--tw-border-opacity, 1))}.border-purple-200{--tw-border-opacity:1;border-color:rgb(233 213 255 / var(--tw-border-opacity, 1))}.border-stone-200{--tw-border-opacity:1;border-color:rgb(231 229 228 / var(--tw-border-opacity, 1))}.border-stone-300{--tw-border-opacity:1;border-color:rgb(214 211 209 / var(--tw-border-opacity, 1))}.border-stone-600{--tw-border-opacity:1;border-color:rgb(87 83 78 / var(--tw-border-opacity, 1))}.border-stone-800{--tw-border-opacity:1;border-color:rgb(41 37 36 / var(--tw-border-opacity, 1))}.bg-\[\#222222\]{--tw-bg-opacity:1;background-color:rgb(34 34 34 / var(--tw-bg-opacity, 1))}.bg-\[\#f3e8ff\]{--tw-bg-opacity:1;background-color:rgb(243 232 255 / var(--tw-bg-opacity, 1))}.bg-\[\#f7f4ea\]{--tw-bg-opacity:1;background-color:rgb(247 244 234 / var(--tw-bg-opacity, 1))}.bg-\[\#fff0f3\]{--tw-bg-opacity:1;background-color:rgb(255 240 243 / var(--tw-bg-opacity, 1))}.bg-stone-700{--tw-bg-opacity:1;background-color:rgb(68 64 60 / var(--tw-bg-opacity, 1))}.bg-stone-800{--tw-bg-opacity:1;background-color:rgb(41 37 36 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/40{background-color:rgb(255 255 255 / 0.4)}.bg-white\/50{background-color:rgb(255 255 255 / 0.5)}.p-2{padding:0.5rem}.p-2\.5{padding:0.625rem}.p-4{padding:1rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.pb-1{padding-bottom:0.25rem}.pb-1\.5{padding-bottom:0.375rem}.pb-2{padding-bottom:0.5rem}.pr-12{padding-right:3rem}.pt-0\.5{padding-top:0.125rem}.pt-2{padding-top:0.5rem}.text-left{text-align:left}.text-center{text-align:center}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-\[8px\]{font-size:8px}.text-\[9px\]{font-size:9px}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-normal{font-weight:400}.font-semibold{font-weight:600}.italic{font-style:italic}.leading-relaxed{line-height:1.625}.tracking-wide{letter-spacing:0.025em}.tracking-wider{letter-spacing:0.05em}.text-pink-700{--tw-text-opacity:1;color:rgb(190 24 93 / var(--tw-text-opacity, 1))}.text-purple-700{--tw-text-opacity:1;color:rgb(126 34 206 / var(--tw-text-opacity, 1))}.text-stone-400{--tw-text-opacity:1;color:rgb(168 162 158 / var(--tw-text-opacity, 1))}.text-stone-500{--tw-text-opacity:1;color:rgb(120 113 108 / var(--tw-text-opacity, 1))}.text-stone-600{--tw-text-opacity:1;color:rgb(87 83 78 / var(--tw-text-opacity, 1))}.text-stone-700{--tw-text-opacity:1;color:rgb(68 64 60 / var(--tw-text-opacity, 1))}.text-stone-800{--tw-text-opacity:1;color:rgb(41 37 36 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.opacity-0{opacity:0}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.outline-none{outline:2px solid transparent;outline-offset:2px}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-black:hover{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity, 1))}.hover\:bg-stone-100:hover{--tw-bg-opacity:1;background-color:rgb(245 245 244 / var(--tw-bg-opacity, 1))}.hover\:bg-stone-900:hover{--tw-bg-opacity:1;background-color:rgb(28 25 23 / var(--tw-bg-opacity, 1))}.hover\:text-black:hover{--tw-text-opacity:1;color:rgb(0 0 0 / var(--tw-text-opacity, 1))}.hover\:text-red-500:hover{--tw-text-opacity:1;color:rgb(239 68 68 / var(--tw-text-opacity, 1))}.hover\:text-stone-800:hover{--tw-text-opacity:1;color:rgb(41 37 36 / var(--tw-text-opacity, 1))}.focus\:border-stone-800:focus{--tw-border-opacity:1;border-color:rgb(41 37 36 / var(--tw-border-opacity, 1))}.group:hover .group-hover\:opacity-100{opacity:1}@media (min-width: 640px){.sm\:gap-2{gap:0.5rem}.sm\:p-4{padding:1rem}}</style></head>
+<body class="p-2 sm:p-4 min-h-screen flex flex-col items-center justify-start">
+
+    <div id="mainWidget" class="widget-container w-full max-w-3xl flex flex-col relative overflow-visible">
+        
+        <!-- Top Bar with Live Time and Add Block Buttons -->
+        <div class="flex justify-between items-center px-3 py-1.5 border-b-2 border-stone-800 text-xs font-bold text-stone-700 bg-white/50 rounded-t-[10px]">
+            <div class="flex items-center gap-1.5 text-stone-700 font-bold text-[11px]">
+                <i class="fa-regular fa-clock text-stone-500"></i>
+                <span id="currentTime" class="tracking-wide">18:25:50</span>
+            </div>
+
+            <!-- Action buttons for adding text or image blocks -->
+            <div class="flex items-center gap-1.5">
+                <button id="addBlockBtn" type="button" class="add-block-btn flex items-center gap-1 shadow-sm" title="Añadir bloque de texto">
+                    <i class="fa-solid fa-align-left text-[9px]"></i>
+                    <span>+ Texto</span>
+                </button>
+                <button id="addImageBlockBtn" type="button" class="add-block-btn flex items-center gap-1 shadow-sm bg-stone-700 hover:bg-stone-900" title="Añadir bloque de imagen">
+                    <i class="fa-solid fa-image text-[9px]"></i>
+                    <span>+ Imagen</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Header Area -->
+        <div class="header-bg relative px-3 py-2 flex flex-col justify-center border-b-2 border-stone-800">
+            
+            <!-- Navigation Buttons Row -->
+            <div class="relative z-20 flex flex-wrap justify-between items-center gap-1.5">
+                
+                <!-- Theme Menu Trigger & Popover -->
+                <div class="relative">
+                    <button onclick="toggleThemeMenu(event)" type="button" class="btn-pill px-2.5 py-1 text-xs flex items-center justify-center gap-1 shadow-sm" title="Cambiar tema y colores">
+                        <i class="fa-solid fa-palette text-xs"></i>
+                    </button>
+
+                    <!-- Theme Popover Menu -->
+                    <div id="themePopover" class="theme-popover hidden">
+                        <div class="flex justify-between items-center pb-2 border-b border-stone-200 mb-2">
+                            <span class="font-bold text-xs text-stone-800">🎨 Personalizar Tema</span>
+                            <button onclick="closeThemeMenu()" type="button" class="text-stone-400 hover:text-black text-xs px-1">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Presets -->
+                        <div class="mb-3">
+                            <span class="text-[10px] font-bold text-stone-500 block mb-1">PRESETS:</span>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <button onclick="applyPreset('caramel')" type="button" class="px-2 py-1 rounded text-xs font-semibold bg-[#f7f4ea] border border-stone-300 text-stone-800 hover:scale-105 transition text-center">🍵 Matcha</button>
+                                <button onclick="applyPreset('strawberry')" type="button" class="px-2 py-1 rounded text-xs font-semibold bg-[#fff0f3] border border-pink-200 text-pink-700 hover:scale-105 transition text-center">🍓 Fresita</button>
+                                <button onclick="applyPreset('darkY2K')" type="button" class="px-2 py-1 rounded text-xs font-semibold bg-[#222222] text-white border border-stone-600 hover:scale-105 transition text-center">🖤 Dark</button>
+                                <button onclick="applyPreset('lavender')" type="button" class="px-2 py-1 rounded text-xs font-semibold bg-[#f3e8ff] text-purple-700 border border-purple-200 hover:scale-105 transition text-center">🫐 Lavanda</button>
+                            </div>
+                        </div>
+
+                        <!-- Custom Colors -->
+                        <div class="pt-2 border-t border-stone-200">
+                            <span class="text-[10px] font-bold text-stone-500 block mb-1.5">COLORES INDIVIDUALES:</span>
+                            <div class="space-y-1.5 text-xs">
+                                <label class="flex items-center justify-between text-stone-700 font-medium">
+                                    <span>Fondo principal:</span>
+                                    <input type="color" id="pickerBgMain" value="#f7f4ea" onchange="updateCustomColor('--bg-main', this.value)" class="color-picker-input">
+                                </label>
+                                <label class="flex items-center justify-between text-stone-700 font-medium">
+                                    <span>Fondo cabecera:</span>
+                                    <input type="color" id="pickerBgHeader" value="#f4efe0" onchange="updateCustomColor('--bg-header', this.value)" class="color-picker-input">
+                                </label>
+                                <label class="flex items-center justify-between text-stone-700 font-medium">
+                                    <span>Barra de música:</span>
+                                    <input type="color" id="pickerBgMarquee" value="#aa9f8f" onchange="updateCustomColor('--bg-marquee', this.value)" class="color-picker-input">
+                                </label>
+                                <label class="flex items-center justify-between text-stone-700 font-medium">
+                                    <span>Color de texto:</span>
+                                    <input type="color" id="pickerTextMain" value="#333333" onchange="updateCustomColor('--text-main', this.value)" class="color-picker-input">
+                                </label>
+                                <label class="flex items-center justify-between text-stone-700 font-medium">
+                                    <span>Botones:</span>
+                                    <input type="color" id="pickerBtnBg" value="#000000" onchange="updateCustomColor('--btn-bg', this.value)" class="color-picker-input">
+                                </label>
+                                <label class="flex items-center justify-between text-stone-700 font-medium">
+                                    <span>Botón activo:</span>
+                                    <input type="color" id="pickerBtnActive" value="#4a5d43" onchange="updateCustomColor('--btn-active', this.value)" class="color-picker-input">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Navigation Tabs -->
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <button onclick="switchTab('star')" type="button" class="tab-btn btn-pill px-3 py-1 text-xs flex items-center gap-1 active" data-tab="star" title="Doble clic para editar el texto">
+                        <span ondblclick="enableTabEdit(this)" onblur="disableTabEdit(this)" contenteditable="false" spellcheck="false" class="tab-label">☆</span>
+                    </button>
+                    <button onclick="switchTab('profile')" type="button" class="tab-btn btn-pill px-3.5 py-1 text-xs flex items-center gap-1" data-tab="profile" title="Doble clic para editar el texto">
+                        <span ondblclick="enableTabEdit(this)" onblur="disableTabEdit(this)" contenteditable="false" spellcheck="false" class="tab-label">profile</span>
+                    </button>
+                    <button onclick="switchTab('byf')" type="button" class="tab-btn btn-pill px-3.5 py-1 text-xs flex items-center gap-1" data-tab="byf" title="Doble clic para editar el texto">
+                        <span ondblclick="enableTabEdit(this)" onblur="disableTabEdit(this)" contenteditable="false" spellcheck="false" class="tab-label">byf + dni</span>
+                    </button>
+                    <button onclick="switchTab('likes')" type="button" class="tab-btn btn-pill px-3.5 py-1 text-xs flex items-center gap-1" data-tab="likes" title="Doble clic para editar el texto">
+                        <span ondblclick="enableTabEdit(this)" onblur="disableTabEdit(this)" contenteditable="false" spellcheck="false" class="tab-label">likes</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Marquee Music Bar -->
+        <div class="marquee-container py-1.5 border-b-2 border-stone-800 text-xs font-semibold tracking-wider relative z-0">
+            <div class="marquee-content flex gap-8 items-center" id="marqueeText">
+                <span><i class="fa-solid fa-music mr-1"></i> <span contenteditable="true" spellcheck="false">Song Name - Artist</span></span>
+                <span>...</span>
+                <span><i class="fa-solid fa-music mr-1"></i> <span contenteditable="true" spellcheck="false">Song Name - Artist</span></span>
+                <span>...</span>
+                <span><i class="fa-solid fa-music mr-1"></i> <span contenteditable="true" spellcheck="false">Song Name - Artist</span></span>
+                <span>...</span>
+            </div>
+        </div>
+
+        <!-- Content Area (Dynamic Grid Layout) -->
+        <div class="p-4 min-h-[220px] relative z-0">
+            
+            <!-- TAB: BYF + DNI -->
+            <div id="tab-byf" class="tab-content hidden">
+                
+                <!-- Text Block 1 -->
+                <div class="widget-block widget-block-text pixel-border-sm bg-white/40 p-2.5 rounded-md relative group flex flex-col justify-between">
+                    <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-stone-300 text-[10px] text-stone-500 font-medium pr-12">
+                        <div class="flex items-center gap-1.5 overflow-hidden">
+                            <span class="font-bold">+</span>
+                            <span class="tag-highlight truncate" contenteditable="true" spellcheck="false">Antes de seguir</span>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons on top right -->
+                    <div class="absolute top-2 right-2 flex items-center gap-1 z-20">
+                        <button onclick="toggleFmtMenu(this)" type="button" class="fmt-btn" title="Formato y Alineación">
+                            <i class="fa-solid fa-sliders text-[9px]"></i>
+                        </button>
+                        <button onclick="deleteBlock(this)" type="button" class="text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition text-xs" title="Eliminar bloque">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+
+                        <!-- Floating Compact Format Menu -->
+                        <div class="fmt-dropdown hidden" onclick="event.stopPropagation()">
+                            <div class="flex items-center justify-between border-b border-stone-200 pb-1 text-[9px] font-bold text-stone-500">
+                                <span>FORMATO</span>
+                                <button onclick="closeFmtMenu(this)" type="button" class="text-stone-400 hover:text-stone-800"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="flex items-center justify-around">
+                                <button onclick="toggleBold(this)" type="button" class="fmt-btn font-bold" title="Negrita">B</button>
+                                <button onclick="toggleItalic(this)" type="button" class="fmt-btn italic" title="Itálica">I</button>
+                            </div>
+                            <div class="text-[9px] font-bold text-stone-500 pt-0.5">ALINEACIÓN H.</div>
+                            <div class="flex items-center justify-between">
+                                <button onclick="setTextAlign(this, 'left')" type="button" class="fmt-btn" title="Izquierda"><i class="fa-solid fa-align-left text-[8px]"></i></button>
+                                <button onclick="setTextAlign(this, 'center')" type="button" class="fmt-btn" title="Centro"><i class="fa-solid fa-align-center text-[8px]"></i></button>
+                                <button onclick="setTextAlign(this, 'right')" type="button" class="fmt-btn" title="Derecha"><i class="fa-solid fa-align-right text-[8px]"></i></button>
+                            </div>
+                            <div class="text-[9px] font-bold text-stone-500 pt-0.5">ALINEACIÓN V.</div>
+                            <div class="flex items-center justify-between">
+                                <button onclick="setVerticalAlign(this, 'start')" type="button" class="fmt-btn" title="Arriba"><i class="fa-solid fa-arrow-up text-[8px]"></i></button>
+                                <button onclick="setVerticalAlign(this, 'center')" type="button" class="fmt-btn" title="Centro Vertical"><i class="fa-solid fa-arrows-up-down text-[8px]"></i></button>
+                                <button onclick="setVerticalAlign(this, 'end')" type="button" class="fmt-btn" title="Abajo"><i class="fa-solid fa-arrow-down text-[8px]"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-content-area flex flex-col min-h-[60px] h-full justify-start">
+                        <div contenteditable="true" spellcheck="false" class="editable-text-target text-xs leading-relaxed w-full text-left font-normal">
+                            Escribe tu contenido aquí... Haz doble clic para editar o usa la barra superior para cambiar formato y alineación.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB: PROFILE -->
+            <div id="tab-profile" class="tab-content hidden">
+                <div class="widget-block widget-block-text pixel-border-sm bg-white/40 p-2.5 rounded-md relative group flex flex-col justify-between">
+                    <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-stone-300 text-[10px] text-stone-500 font-medium pr-12">
+                        <div class="flex items-center gap-1.5 overflow-hidden">
+                            <span class="font-bold">+</span>
+                            <span class="tag-highlight truncate" contenteditable="true" spellcheck="false">About Me</span>
+                        </div>
+                    </div>
+                    <div class="absolute top-2 right-2 flex items-center gap-1 z-20">
+                        <button onclick="toggleFmtMenu(this)" type="button" class="fmt-btn" title="Formato y Alineación">
+                            <i class="fa-solid fa-sliders text-[9px]"></i>
+                        </button>
+                        <button onclick="deleteBlock(this)" type="button" class="text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition text-xs" title="Eliminar bloque">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <div class="fmt-dropdown hidden" onclick="event.stopPropagation()">
+                            <div class="flex items-center justify-between border-b border-stone-200 pb-1 text-[9px] font-bold text-stone-500">
+                                <span>FORMATO</span>
+                                <button onclick="closeFmtMenu(this)" type="button" class="text-stone-400 hover:text-stone-800"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="flex items-center justify-around">
+                                <button onclick="toggleBold(this)" type="button" class="fmt-btn font-bold" title="Negrita">B</button>
+                                <button onclick="toggleItalic(this)" type="button" class="fmt-btn italic" title="Itálica">I</button>
+                            </div>
+                            <div class="text-[9px] font-bold text-stone-500 pt-0.5">ALINEACIÓN H.</div>
+                            <div class="flex items-center justify-between">
+                                <button onclick="setTextAlign(this, 'left')" type="button" class="fmt-btn" title="Izquierda"><i class="fa-solid fa-align-left text-[8px]"></i></button>
+                                <button onclick="setTextAlign(this, 'center')" type="button" class="fmt-btn" title="Centro"><i class="fa-solid fa-align-center text-[8px]"></i></button>
+                                <button onclick="setTextAlign(this, 'right')" type="button" class="fmt-btn" title="Derecha"><i class="fa-solid fa-align-right text-[8px]"></i></button>
+                            </div>
+                            <div class="text-[9px] font-bold text-stone-500 pt-0.5">ALINEACIÓN V.</div>
+                            <div class="flex items-center justify-between">
+                                <button onclick="setVerticalAlign(this, 'start')" type="button" class="fmt-btn" title="Arriba"><i class="fa-solid fa-arrow-up text-[8px]"></i></button>
+                                <button onclick="setVerticalAlign(this, 'center')" type="button" class="fmt-btn" title="Centro Vertical"><i class="fa-solid fa-arrows-up-down text-[8px]"></i></button>
+                                <button onclick="setVerticalAlign(this, 'end')" type="button" class="fmt-btn" title="Abajo"><i class="fa-solid fa-arrow-down text-[8px]"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-content-area flex flex-col justify-start min-h-[60px] h-full">
+                        <div contenteditable="true" spellcheck="false" class="editable-text-target text-xs leading-relaxed font-normal text-left w-full">
+                            hello! welcome to my profile page ~ she/they ✦ artist &amp; music lover.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: LIKES -->
+            <div id="tab-likes" class="tab-content hidden">
+                <div class="widget-block widget-block-text pixel-border-sm bg-white/40 p-2.5 rounded-md relative group flex flex-col justify-between">
+                    <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-stone-300 text-[10px] text-stone-500 font-medium pr-12">
+                        <div class="flex items-center gap-1.5 overflow-hidden">
+                            <span class="font-bold">+</span>
+                            <span class="tag-highlight truncate" contenteditable="true" spellcheck="false">Favorites</span>
+                        </div>
+                    </div>
+                    <div class="absolute top-2 right-2 flex items-center gap-1 z-20">
+                        <button onclick="toggleFmtMenu(this)" type="button" class="fmt-btn" title="Formato y Alineación">
+                            <i class="fa-solid fa-sliders text-[9px]"></i>
+                        </button>
+                        <button onclick="deleteBlock(this)" type="button" class="text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition text-xs" title="Eliminar bloque">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <div class="fmt-dropdown hidden" onclick="event.stopPropagation()">
+                            <div class="flex items-center justify-between border-b border-stone-200 pb-1 text-[9px] font-bold text-stone-500">
+                                <span>FORMATO</span>
+                                <button onclick="closeFmtMenu(this)" type="button" class="text-stone-400 hover:text-stone-800"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="flex items-center justify-around">
+                                <button onclick="toggleBold(this)" type="button" class="fmt-btn font-bold" title="Negrita">B</button>
+                                <button onclick="toggleItalic(this)" type="button" class="fmt-btn italic" title="Itálica">I</button>
+                            </div>
+                            <div class="text-[9px] font-bold text-stone-500 pt-0.5">ALINEACIÓN H.</div>
+                            <div class="flex items-center justify-between">
+                                <button onclick="setTextAlign(this, 'left')" type="button" class="fmt-btn" title="Izquierda"><i class="fa-solid fa-align-left text-[8px]"></i></button>
+                                <button onclick="setTextAlign(this, 'center')" type="button" class="fmt-btn" title="Centro"><i class="fa-solid fa-align-center text-[8px]"></i></button>
+                                <button onclick="setTextAlign(this, 'right')" type="button" class="fmt-btn" title="Derecha"><i class="fa-solid fa-align-right text-[8px]"></i></button>
+                            </div>
+                            <div class="text-[9px] font-bold text-stone-500 pt-0.5">ALINEACIÓN V.</div>
+                            <div class="flex items-center justify-between">
+                                <button onclick="setVerticalAlign(this, 'start')" type="button" class="fmt-btn" title="Arriba"><i class="fa-solid fa-arrow-up text-[8px]"></i></button>
+                                <button onclick="setVerticalAlign(this, 'center')" type="button" class="fmt-btn" title="Centro Vertical"><i class="fa-solid fa-arrows-up-down text-[8px]"></i></button>
+                                <button onclick="setVerticalAlign(this, 'end')" type="button" class="fmt-btn" title="Abajo"><i class="fa-solid fa-arrow-down text-[8px]"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-content-area flex flex-col justify-start min-h-[60px] h-full">
+                        <div contenteditable="true" spellcheck="false" class="editable-text-target text-xs leading-relaxed font-normal text-left w-full">
+                            ♡ cats, matcha latte, cozy games, retro web aesthetic, lofi music.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: STAR -->
+            <div id="tab-star" class="tab-content">
+                <div class="widget-block widget-block-text pixel-border-sm bg-white/40 p-2.5 rounded-md relative group flex flex-col justify-between">
+                    <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-stone-300 text-[10px] text-stone-500 font-medium pr-12">
+                        <div class="flex items-center gap-1.5 overflow-hidden">
+                            <span class="font-bold">+</span>
+                            <span class="tag-highlight truncate" contenteditable="true" spellcheck="false">Status Update</span>
+                        </div>
+                    </div>
+                    <div class="absolute top-2 right-2 flex items-center gap-1 z-20">
+                        <button onclick="toggleFmtMenu(this)" type="button" class="fmt-btn" title="Formato y Alineación">
+                            <i class="fa-solid fa-sliders text-[9px]"></i>
+                        </button>
+                        <button onclick="deleteBlock(this)" type="button" class="text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition text-xs" title="Eliminar bloque">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <div class="fmt-dropdown hidden" onclick="event.stopPropagation()">
+                            <div class="flex items-center justify-between border-b border-stone-200 pb-1 text-[9px] font-bold text-stone-500">
+                                <span>FORMATO</span>
+                                <button onclick="closeFmtMenu(this)" type="button" class="text-stone-400 hover:text-stone-800"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="flex items-center justify-around">
+                                <button onclick="toggleBold(this)" type="button" class="fmt-btn font-bold" title="Negrita">B</button>
+                                <button onclick="toggleItalic(this)" type="button" class="fmt-btn italic" title="Itálica">I</button>
+                            </div>
+                            <div class="text-[9px] font-bold text-stone-500 pt-0.5">ALINEACIÓN H.</div>
+                            <div class="flex items-center justify-between">
+                                <button onclick="setTextAlign(this, 'left')" type="button" class="fmt-btn" title="Izquierda"><i class="fa-solid fa-align-left text-[8px]"></i></button>
+                                <button onclick="setTextAlign(this, 'center')" type="button" class="fmt-btn" title="Centro"><i class="fa-solid fa-align-center text-[8px]"></i></button>
+                                <button onclick="setTextAlign(this, 'right')" type="button" class="fmt-btn" title="Derecha"><i class="fa-solid fa-align-right text-[8px]"></i></button>
+                            </div>
+                            <div class="text-[9px] font-bold text-stone-500 pt-0.5">ALINEACIÓN V.</div>
+                            <div class="flex items-center justify-between">
+                                <button onclick="setVerticalAlign(this, 'start')" type="button" class="fmt-btn" title="Arriba"><i class="fa-solid fa-arrow-up text-[8px]"></i></button>
+                                <button onclick="setVerticalAlign(this, 'center')" type="button" class="fmt-btn" title="Centro Vertical"><i class="fa-solid fa-arrows-up-down text-[8px]"></i></button>
+                                <button onclick="setVerticalAlign(this, 'end')" type="button" class="fmt-btn" title="Abajo"><i class="fa-solid fa-arrow-down text-[8px]"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-content-area flex flex-col justify-start min-h-[60px] h-full">
+                        <div contenteditable="true" spellcheck="false" class="editable-text-target text-xs leading-relaxed font-normal text-left w-full">gdfgdffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal-overlay hidden">
+        <div class="bg-white border-2 border-stone-800 rounded-xl p-4 w-11/12 max-w-md shadow-2xl relative">
+            <div class="flex justify-between items-center mb-3">
+                <span class="font-bold text-sm text-stone-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-link text-stone-600"></i> Ingresar URL de Imagen
+                </span>
+                <button onclick="closeImageModal()" type="button" class="text-stone-400 hover:text-black">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <input type="url" id="imageUrlInput" placeholder="https://ejemplo.com/imagen.jpg" class="w-full border-2 border-stone-300 rounded-lg p-2 text-xs mb-3 outline-none focus:border-stone-800 font-medium" value="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&amp;w=300&amp;auto=format&amp;fit=crop">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeImageModal()" type="button" class="px-3 py-1.5 rounded-lg border border-stone-300 text-xs font-semibold hover:bg-stone-100">
+                    Cancelar
+                </button>
+                <button onclick="saveImageURL()" type="button" class="px-4 py-1.5 rounded-lg bg-stone-800 text-white text-xs font-bold hover:bg-black">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Real-time clock logic
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES', { hour12: false });
+            const clockEl = document.getElementById('currentTime');
+            if (clockEl) clockEl.textContent = timeString;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Switch between tabs
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) targetTab.classList.remove('hidden');
+
+            const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        // Tab label edit (double click)
+        function enableTabEdit(span) {
+            span.contentEditable = "true";
+            span.focus();
+        }
+
+        function disableTabEdit(span) {
+            span.contentEditable = "false";
+        }
+
+        // Toggle and Close Format Dropdown Menu
+        function toggleFmtMenu(button) {
+            event.stopPropagation();
+            const parent = button.closest('.absolute');
+            const menu = parent.querySelector('.fmt-dropdown');
+            
+            // Close other format menus
+            document.querySelectorAll('.fmt-dropdown').forEach(m => {
+                if (m !== menu) m.classList.add('hidden');
+            });
+
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        function closeFmtMenu(button) {
+            const menu = button.closest('.fmt-dropdown');
+            if (menu) menu.classList.add('hidden');
+        }
+
+        // Close dropdowns on outside click
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.fmt-dropdown').forEach(m => m.classList.add('hidden'));
+        });
+
+        // Text Formatting Handlers
+        function toggleBold(btn) {
+            const block = btn.closest('.widget-block-text');
+            const target = block.querySelector('.editable-text-target');
+            if (target) {
+                target.classList.toggle('font-bold');
+                target.classList.toggle('font-normal');
+                btn.classList.toggle('active');
+            }
+        }
+
+        function toggleItalic(btn) {
+            const block = btn.closest('.widget-block-text');
+            const target = block.querySelector('.editable-text-target');
+            if (target) {
+                target.classList.toggle('italic');
+                btn.classList.toggle('active');
+            }
+        }
+
+        function setTextAlign(btn, alignment) {
+            const block = btn.closest('.widget-block-text');
+            const target = block.querySelector('.editable-text-target');
+            if (target) {
+                target.classList.remove('text-left', 'text-center', 'text-right');
+                target.classList.add(`text-${alignment}`);
+            }
+        }
+
+        function setVerticalAlign(btn, alignment) {
+            const block = btn.closest('.widget-block-text');
+            const container = block.querySelector('.text-content-area');
+            if (container) {
+                container.classList.remove('justify-start', 'justify-center', 'justify-end');
+                container.classList.add(`justify-${alignment}`);
+            }
+        }
+
+        // Add new text block dynamically
+        document.getElementById('addBlockBtn').addEventListener('click', () => {
+            const activeTab = document.querySelector('.tab-content:not(.hidden)');
+            if (!activeTab) return;
+
+            const newBlock = document.createElement('div');
+            newBlock.className = 'widget-block widget-block-text pixel-border-sm bg-white/40 p-2.5 rounded-md relative group flex flex-col justify-between';
+            newBlock.innerHTML = `
+                <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-stone-300 text-[10px] text-stone-500 font-medium pr-12">
+                    <div class="flex items-center gap-1.5 overflow-hidden">
+                        <span class="font-bold">+</span>
+                        <span class="tag-highlight truncate" contenteditable="true" spellcheck="false">Nuevo Título</span>
+                    </div>
+                </div>
+                <div class="absolute top-2 right-2 flex items-center gap-1 z-20">
+                    <button onclick="toggleFmtMenu(this)" type="button" class="fmt-btn" title="Formato y Alineación">
+                        <i class="fa-solid fa-sliders text-[9px]"></i>
+                    </button>
+                    <button onclick="deleteBlock(this)" type="button" class="text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition text-xs" title="Eliminar bloque">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div class="fmt-dropdown hidden" onclick="event.stopPropagation()">
+                        <div class="flex items-center justify-between border-b border-stone-200 pb-1 text-[9px] font-bold text-stone-500">
+                            <span>FORMATO</span>
+                            <button onclick="closeFmtMenu(this)" type="button" class="text-stone-400 hover:text-stone-800"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="flex items-center justify-around">
+                            <button onclick="toggleBold(this)" type="button" class="fmt-btn font-bold" title="Negrita">B</button>
+                            <button onclick="toggleItalic(this)" type="button" class="fmt-btn italic" title="Itálica">I</button>
+                        </div>
+                        <div class="text-[9px] font-bold text-stone-500 pt-0.5">ALINEACIÓN H.</div>
+                        <div class="flex items-center justify-between">
+                            <button onclick="setTextAlign(this, 'left')" type="button" class="fmt-btn" title="Izquierda"><i class="fa-solid fa-align-left text-[8px]"></i></button>
+                            <button onclick="setTextAlign(this, 'center')" type="button" class="fmt-btn" title="Centro"><i class="fa-solid fa-align-center text-[8px]"></i></button>
+                            <button onclick="setTextAlign(this, 'right')" type="button" class="fmt-btn" title="Derecha"><i class="fa-solid fa-align-right text-[8px]"></i></button>
+                        </div>
+                        <div class="text-[9px] font-bold text-stone-500 pt-0.5">ALINEACIÓN V.</div>
+                        <div class="flex items-center justify-between">
+                            <button onclick="setVerticalAlign(this, 'start')" type="button" class="fmt-btn" title="Arriba"><i class="fa-solid fa-arrow-up text-[8px]"></i></button>
+                            <button onclick="setVerticalAlign(this, 'center')" type="button" class="fmt-btn" title="Centro Vertical"><i class="fa-solid fa-arrows-up-down text-[8px]"></i></button>
+                            <button onclick="setVerticalAlign(this, 'end')" type="button" class="fmt-btn" title="Abajo"><i class="fa-solid fa-arrow-down text-[8px]"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-content-area flex flex-col justify-start min-h-[60px] h-full">
+                    <div contenteditable="true" spellcheck="false" class="editable-text-target text-xs leading-relaxed font-normal text-left w-full">
+                        Escribe tu contenido aquí... Puedes editar cualquier texto haciendo clic.
+                    </div>
+                </div>
+            `;
+
+            activeTab.appendChild(newBlock);
+        });
+
+        // Modal Image URL Management
+        let currentEditingContainer = null;
+
+        document.getElementById('addImageBlockBtn').addEventListener('click', () => {
+            currentEditingContainer = null;
+            document.getElementById('imageUrlInput').value = "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=300&auto=format&fit=crop";
+            document.getElementById('imageModal').classList.remove('hidden');
+        });
+
+        function openImageModal(container) {
+            currentEditingContainer = container;
+            const img = container.querySelector('img');
+            document.getElementById('imageUrlInput').value = img ? img.src : '';
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+            currentEditingContainer = null;
+        }
+
+        function saveImageURL() {
+            const input = document.getElementById('imageUrlInput');
+            const url = input.value.trim();
+            const finalUrl = url !== '' ? url : 'https://placehold.co/300x200/e2e8f0/475569?text=Sin+Imagen';
+
+            if (currentEditingContainer) {
+                const img = currentEditingContainer.querySelector('img');
+                if (img) {
+                    img.src = finalUrl;
+                } else {
+                    currentEditingContainer.innerHTML = `<img src="${finalUrl}" alt="Preview" onerror="this.src='https://placehold.co/300x200/e2e8f0/475569?text=URL+Invalida'">`;
+                }
+            } else {
+                const activeTab = document.querySelector('.tab-content:not(.hidden)');
+                if (activeTab) {
+                    const newBlock = document.createElement('div');
+                    newBlock.className = 'widget-block widget-block-img pixel-border-sm bg-white/40 p-2.5 rounded-md relative group flex flex-col justify-between';
+                    newBlock.innerHTML = `
+                        <button onclick="deleteBlock(this)" type="button" class="absolute top-2 right-2 text-stone-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition text-xs z-10" title="Eliminar bloque">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <div class="flex items-center gap-1.5 pb-1.5 mb-1.5 border-b border-stone-300 text-[10px] text-stone-500 font-medium">
+                            <span class="font-bold">+</span>
+                            <span class="tag-highlight" contenteditable="true" spellcheck="false">Imagen</span>
+                        </div>
+                        <div class="image-preview-container" onclick="openImageModal(this)">
+                            <img src="${finalUrl}" alt="Preview" onerror="this.src='https://placehold.co/300x200/e2e8f0/475569?text=URL+Invalida'">
+                        </div>
+                    `;
+                    activeTab.appendChild(newBlock);
+                }
+            }
+
+            closeImageModal();
+        }
+
+        // Delete block function
+        function deleteBlock(button) {
+            const block = button.closest('.widget-block');
+            if (block) {
+                block.remove();
+            }
+        }
+
+        // Popover Theme Menu Controls
+        function toggleThemeMenu(e) {
+            e.stopPropagation();
+            const popover = document.getElementById('themePopover');
+            popover.classList.toggle('hidden');
+        }
+
+        function closeThemeMenu() {
+            document.getElementById('themePopover').classList.add('hidden');
+        }
+
+        // Close popover when clicking outside
+        document.addEventListener('click', (e) => {
+            const popover = document.getElementById('themePopover');
+            if (popover && !popover.contains(e.target)) {
+                popover.classList.add('hidden');
+            }
+        });
+
+        // Update CSS custom property variable
+        function updateCustomColor(variable, value) {
+            document.documentElement.style.setProperty(variable, value);
+        }
+
+        // Preset Color Palettes
+        const presets = {
+            caramel: {
+                '--bg-main': '#f7f4ea',
+                '--bg-header': '#f4efe0',
+                '--bg-marquee': '#aa9f8f',
+                '--text-main': '#333333',
+                '--border-color': '#2d2d2d',
+                '--btn-bg': '#000000',
+                '--btn-text': '#ffffff',
+                '--btn-active': '#4a5d43',
+                '--tag-bg': '#dde5d3',
+                '--tag-text': '#4a5d43',
+                '--cat-color': '#8c7e6c'
+            },
+            strawberry: {
+                '--bg-main': '#fff0f3',
+                '--bg-header': '#ffe3e8',
+                '--bg-marquee': '#ffb3c1',
+                '--text-main': '#4a1525',
+                '--border-color': '#591a2b',
+                '--btn-bg': '#ff4d6d',
+                '--btn-text': '#ffffff',
+                '--btn-active': '#c9184a',
+                '--tag-bg': '#ffccd5',
+                '--tag-text': '#800f2f',
+                '--cat-color': '#c9184a'
+            },
+            darkY2K: {
+                '--bg-main': '#1e1e24',
+                '--bg-header': '#2b2b36',
+                '--bg-marquee': '#3d3d4e',
+                '--text-main': '#e0e0e0',
+                '--border-color': '#000000',
+                '--btn-bg': '#ff007f',
+                '--btn-text': '#ffffff',
+                '--btn-active': '#7928ca',
+                '--tag-bg': '#382a4b',
+                '--tag-text': '#ff79c6',
+                '--cat-color': '#ff007f'
+            },
+            lavender: {
+                '--bg-main': '#f3e8ff',
+                '--bg-header': '#e9d5ff',
+                '--bg-marquee': '#c084fc',
+                '--text-main': '#3b0764',
+                '--border-color': '#3b0764',
+                '--btn-bg': '#7e22ce',
+                '--btn-text': '#ffffff',
+                '--btn-active': '#a855f7',
+                '--tag-bg': '#ddd6fe',
+                '--tag-text': '#581c87',
+                '--cat-color': '#7e22ce'
+            }
+        };
+
+        function applyPreset(presetName) {
+            const theme = presets[presetName];
+            if (!theme) return;
+            
+            for (const [key, val] of Object.entries(theme)) {
+                updateCustomColor(key, val);
+            }
+
+            // Sync pickers
+            if (document.getElementById('pickerBgMain')) document.getElementById('pickerBgMain').value = theme['--bg-main'];
+            if (document.getElementById('pickerBgHeader')) document.getElementById('pickerBgHeader').value = theme['--bg-header'];
+            if (document.getElementById('pickerBgMarquee')) document.getElementById('pickerBgMarquee').value = theme['--bg-marquee'];
+            if (document.getElementById('pickerTextMain')) document.getElementById('pickerTextMain').value = theme['--text-main'];
+            if (document.getElementById('pickerBtnBg')) document.getElementById('pickerBtnBg').value = theme['--btn-bg'];
+            if (document.getElementById('pickerBtnActive')) document.getElementById('pickerBtnActive').value = theme['--btn-active'];
+        }
+    </script>
+
+</body></html>

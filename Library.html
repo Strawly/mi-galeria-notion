@@ -682,52 +682,34 @@
     <!-- LÓGICA JAVASCRIPT COMPLETA CORREGIDA -->
     <script>
         const DEFAULT_DATA = {
-            'mapa_grietas': {
-                id: 'mapa_grietas',
-                title: 'El mapa de tus grietas',
-                subtitle: 'Fanfiction de Harry Potter · Draco x Diana',
-                author: 'Draco x Diana',
+            'obra_inicial': {
+                id: 'obra_inicial',
+                title: 'Mi Primera Obra',
+                subtitle: 'N. Autor',
+                author: 'N. Autor',
                 coverColor: 'from-zinc-900 via-slate-900 to-violet-950',
                 dailyGoal: 1000,
                 chapters: {
-                    'prologo': {
-                        id: 'prologo',
-                        title: 'Capítulo Prólogo',
+                    'cap_1': {
+                        id: 'cap_1',
+                        title: 'Capítulo 1',
                         content: `
                             <p class="drop-cap">
-                                La habitación olía a cobre y salvia seca. Draco contaba las runas de hueso de inferi por cuarta vez, deslizando la yema del índice sobre sus estrías hasta que la piel le ardía. Sobre la mesa de piedra esperaban la daga tallada en fémur de no-muerto, el cuenco de obsidiana, los polvos de luna negra y su propia sangre coagulándose en un frasco ahumado. La Marca Tenebrosa le palpitaba en el antebrazo como una segunda arteria, un recordatorio húmedo de que su padre había caído en desgracia en el Ministerio y Azkaban se lo había swallowed.
-                            </p>
-                            <p>
-                                La alquimia antigua no concedía favores gratuitos; exigía carne, hueso de inferi, sangre y una intención tan pura que rasgara el tejido de la realidad. Y él necesitaba saber qué se sentía al tener a alguien incondicional, alguien que no midiera su valor por el apellido ni por la oscuridad de su brazo, porque en aquel cuarto silencioso, con el ritual a medio preparar, Draco entendió que llevaba toda la vida esperando a alguien que se quedara incluso cuando todo se derrumbara.
+                                Comienza a escribir tu historia aquí...
                             </p>
                         `
                     }
                 },
-                characters: [
-                    { id: 'c1', name: 'Draco Malfoy', role: 'Protagonista Masculino', house: 'Slytherin', wand: 'Espino y pelo de unicornio, 10 pulgadas', desc: 'Siente la tortura del sello de la Marca Tenebrosa. Busca desesperadamente una conexión incondicional mediante la alquimia prohibida.', dynamics: 'Vinculado a Diana por el sello incompleto de su muñeca.' },
-                    { id: 'c2', name: 'Diana', role: 'Protagonista Femenina', house: 'Ravenclaw / Gryffindor', wand: 'Nogal negro y fibra de corazón de dragón', desc: 'Su núcleo mágico se fractura en grietas violetas. Es la única cuya alma completa la frecuencia del sello de Draco.', dynamics: 'Mantiene una complicidad profunda y secreta con Draco.' }
-                ],
-                lore: [
-                    { id: 'l1', title: 'El Ritual Alquímico (Anima Refugium)', icon: 'ph-flask', desc: 'Ejecutado por Draco en las mazmorras de la Mansión Malfoy. No busca invocar poder, sino un "Alma Refugio" que alivie la tortura de la Marca Tenebrosa. Graba un sello incompleto en su muñeca derecha.' },
-                    { id: 'l2', title: 'Displasia Mágica & Marcas', icon: 'ph-lightning', desc: 'Por la regla del Intercambio Equivalente, Diana es arrastrada al mundo mágico pero su núcleo se fractura en grietas violetas incandescentes. Una de esas grietas es exactamente la pieza que completa el sello de la muñeca de Draco.' },
-                    { id: 'l3', title: 'Dinámica del Triángulo Emocional', icon: 'ph-users', desc: 'Annie usa un hechizo de pigmento estético para simular la marca de la muñeca y sale con Draco. Diana y Draco mantienen una complicidad de "amigos secretos" previa a Hogwarts. Cero infidelidad física.' },
-                    { id: 'l4', title: 'El Pacto de la Noche', icon: 'ph-heart-handshake', desc: 'Tras descubrir la trampa de la marca falsa de Annie, Draco y Diana sellan su regla inquebrantable de vida: Transparencia absoluta y jamás irse a dormir enojados ni distantes.' }
-                ],
-                timeline: [
-                    { id: 't1', label: '1. Prólogo', desc: 'Draco prepara el ritual alquímico en las mazmorras de la Mansión Malfoy.' },
-                    { id: 't2', label: '2. Pre-Hogwarts', desc: 'Primer encuentro secreto. Diana le revela que sabe lo del brazo. Reacción de calor en las muñecas.' },
-                    { id: 't3', label: '3. Engañado por Annie', desc: 'Annie pinta una marca falsa. Draco sale con ella creyendo que es su destino.' },
-                    { id: 't4', label: '4. 6º Año (Angustia)', desc: 'Diana lo trata como "amigo normal". Celos feroces e inconscientes de Draco.' },
-                    { id: 't5', label: '5. Revelación & Perdón', desc: 'Contacto físico revela las grietas verdaderas. Ruptura con Annie y confesión del ritual.' },
-                    { id: 't6', label: '6. Posguerra & Matrimonio', desc: 'Refugio en la Mansión Malfoy, votos matrimoniales y paz duradera.' }
-                ]
+                characters: [],
+                lore: [],
+                timeline: []
             }
         };
 
         const STORAGE_KEY = 'el_mapa_de_tus_grietas_master_db';
         let appData = {};
-        let activeBookId = 'mapa_grietas';
-        let activeChapterId = 'prologo';
+        let activeBookId = 'obra_inicial';
+        let activeChapterId = 'cap_1';
         let currentFontSize = 1.25;
         let saveTimeout;
         let modalConfirmCallback = null;
@@ -765,6 +747,9 @@
             loadDatabase();
             renderLibrary();
             setupEventListeners();
+            // Mostrar la biblioteca por defecto al abrir
+            workspaceView.classList.add('hidden');
+            libraryView.classList.remove('hidden');
         });
 
         function loadDatabase() {
